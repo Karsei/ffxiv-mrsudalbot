@@ -1,0 +1,29 @@
+{
+  "name": "ffxiv-service-toolbot",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Karsei/ffxiv-service-toolbot.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Karsei/ffxiv-service-toolbot/issues"
+  },
+  "homepage": "https://github.com/Karsei/ffxiv-service-toolbot#readme",
+  "dependencies": {
+    "axios": "^0.21.1",
+    "bluebird": "^3.7.2",
+    "cheerio": "^1.0.0-rc.5",
+    "date-utils": "^1.2.21",
+    "node-cron": "^2.0.3",
+    "redis": "^3.0.2",
+    "winston": "^3.3.3",
+    "winston-daily-rotate-file": "^4.5.0"
+  }
+}
