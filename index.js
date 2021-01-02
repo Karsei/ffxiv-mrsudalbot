@@ -28,12 +28,13 @@ r.on('line', async (line) => {
         try {
             switch (cmd) {
                 case 'exit': {
+                    console.info('bye~!');
                     r.close();
                     break;
                 }
                 case 'echo': {
                     args.shift();
-                    logger.info(args.join(' '));
+                    console.info(args.join(' '));
                     break;
                 }
                 case 'parse': {
@@ -43,6 +44,10 @@ r.on('line', async (line) => {
                 }
                 case 'webhook': {
                     webhook.newsExecuteAll();
+                    break;
+                }
+                default: {
+                    console.error('ERROR: Unknown command.');
                     break;
                 }
             }

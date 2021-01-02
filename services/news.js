@@ -128,7 +128,7 @@ const parseUtil = {
                     parseDetail.thumbnail = $(this).find('img').attr('src');
 
                     let $detail = $(this).find('div.news__list--banner');
-                    parseDetail.description = $detail.find('p:eq(1)').html().replace(/([\r\n|\n|\r])/gm, '').trim();
+                    parseDetail.description = $detail.find('p:eq(1)').text().replace(/([\r\n|\n|\r])/gm, '').trim();
                     
                     list.push(parseDetail);
                 });
