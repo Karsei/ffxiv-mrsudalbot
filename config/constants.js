@@ -16,6 +16,21 @@ const constants = {
 
     // Discord Webhook API 주소
     DISCORD_URL_WEBHOOK: 'https://discord.com/api/webhooks',
+
+    // Discord Bot 웹 호스트 주소
+    DISCORD_URL_BOT_HOST: 'https://discord-bot.karsei.pe.kr:9292',
+
+    // Discord Bot Client ID
+    DISCORD_BOT_CLIENT_ID: '',
+
+    // Discord Bot Client Secret
+    DISCORD_BOT_CLIENT_SECRET: '',
+
+    // Discord Bot Token
+    DISCORD_BOT_TOKEN: '',
+
+    // 채팅 명령어 접두사
+    DISCORD_CHAT_PREFIX: ';!',
 };
 
 module.exports = constants;

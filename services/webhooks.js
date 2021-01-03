@@ -8,11 +8,31 @@ const constants = require('../config/constants');
 const categories = require('../config/categories');
 const lodestoneLocales = require('../config/lodestoneLocales');
 const logger = require('../libs/logger');
+const redis = require('../libs/redis');
 const news = require('./news');
 
 let count = 0;
 
 const webhooks = {
+    subscribe: async (pParams, pUrl) => {
+        // Redis에 Webhook 등록
+        // 나라별
+        Object.keys(categories.Korea).map(type => {
+            redis.sadd(`ko-${type}-webhooks`, pUrl); 
+        });
+
+        // 전체
+        if (!redis.sismembers('all-webhooks', pUrl)) {
+            redis.sadd(`all-webhooks`, pUrl);
+            logger.info(`${pUrl} 등록 완료`);
+        }
+    },
+
+    makeHookUrl: async (pCode, pRedirectUri) => {
+        let res = await discordUtil.createWebhook(pCode, pRedirectUri);
+        return { url: `${constants.DISCORD_URL_WEBHOOK}/${res.data.id}/${res.data.token}`, hookData: res.data };
+    },
+    
     newsExecute: async (pType, pCategory, pLocale) => {
         if (count > 0) return;
         count++;
@@ -20,6 +40,8 @@ const webhooks = {
         // 1. 최신 소식을 가져오면서 REDIS에 넣는다. 반환값은 새롭게 넣어진 것들
         // 1-2. 위에서 새롭게 넣어진 것이 없다면 종료한다.
         let newPosts = pLocale !== 'ko' ? await news.fetchGlobal(pType, pLocale, true) : await news.fetchKorea(pType, true);
+        newPosts = redisUtil.postCache(newPosts, pLocale, pType);
+        if (!newPosts)  return newPosts;
 
         // 2. 새로운 소식을 Embed 메세지로 만든다.
         let newEmbedPosts = newPosts.map(post => {
@@ -44,16 +66,15 @@ const webhooks = {
 
         // 3. REDIS에서 모든 등록된 웹훅 주소를 불러온 후, Embed는 10개씩 한 묶음으로, Webhook은 20개씩 한 묶음으로 구성해서 전송한다.
         // 이때 Discord 웹훅 제한이 걸릴 수 있으므로 주의할 것
+        let whList = redis.smembers(`${locale}-${type}-webhooks`);
         let subcount = 0;
         while (newEmbedPosts.length) {
             let posts = { embeds: newEmbedPosts.splice(0, 2) };
-            if (subcount > 0) break;
+            if (subcount > 2) break;
             subcount++;
-            console.log(posts);
 
             //discordUtil.sendMessage('', posts);
         }
-        console.log(pType, pCategory, pLocale);
     },
     newsExecuteAll: () => {
         let jobs = [];
@@ -91,8 +112,8 @@ const embedMsgTemplate = {
 };
 
 const redisUtil = {
-    postCache: (pData) => {
-        // 
+    postCache: (pData, pLocale, pType) => {
+        pData.filter(e => redis.sadd(`${pLocale}-${pType}-ids`, pData.idx)).sort((a, b) => b.timestamp - a.timestamp);
     }
 }
 
@@ -101,7 +122,7 @@ const discordUtil = {
      * 메세지 전송
      */
     sendMessage: (pUrl, pMsg) => {
-        axios({
+        return axios({
             method: 'POST',
             url: pUrl,
             headers: {
@@ -140,6 +161,24 @@ const discordUtil = {
                 url: oData.image,
             },
         };
+    },
+
+    createWebhook: (pCode, pRedirectUri) => {
+        // https://discord.com/developers/docs/resources/webhook#webhook-object
+        return axios({
+            method: 'POST',
+            url: constants.DISCORD_URL_OAUTH_TOKEN,
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded'
+            },
+            data: {
+                client_id: constants.DISCORD_BOT_CLIENT_ID, 
+                client_secret: constants.DISCORD_BOT_CLIENT_SECRET, 
+                grant_type: 'authorization_code', 
+                code: pCode, 
+                redirect_uri: pRedirectUri,
+            },
+        });
     },
 };
 
