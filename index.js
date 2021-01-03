@@ -18,7 +18,7 @@ discordBot.commands = new Discord.Collection();
 const commandFiles = fs.readdirSync('./commands').filter(file => file.endsWith('.js'));
 for (const file of commandFiles) {
     const command = require(`./commands/${file}`);
-    client.commands.set(command.name, command);
+    discordBot.commands.set(command.name, command);
 }
 
 discordBot.on('warn', err => logger.warn(err));
@@ -69,9 +69,13 @@ discordBot.on('guildCreate', async (guild) => {
     try {
         let serverId = guild.id;
 
-        if (!redis.sismembers('all-guilds', serverId)) {
-            // 서버 추가
-            redis.sadd(`all-guilds`, serverId);
+        redis.sismember('all-guilds', serverId, (err, reply) => {
+            if (err) throw err;
+            if (!reply) {
+                // 서버 추가
+                redis.sadd(`all-guilds`, serverId);
+            }
+        });
 
             // 채널 추가
             // let defChannel;
@@ -100,7 +104,6 @@ discordBot.on('guildCreate', async (guild) => {
                     
             //     }
             // });
-        }
     } catch (err) {
         logger.error(err);
     }

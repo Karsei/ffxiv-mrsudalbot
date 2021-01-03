@@ -22,12 +22,12 @@ app.get('/', (req, res) => {
     });
 });
 
-app.get('/authorize', (req, res) => {
+app.get('/authorize', async (req, res) => {
     // https://discord.com/developers/docs/topics/oauth2
+    // code, state, guild_id, permissions
     let state = req.query.state;
     let error = req.query.error;
     let code  = req.query.code;
-    console.log(req.query);
     
     try {
         if (error) {
@@ -38,15 +38,15 @@ app.get('/authorize', (req, res) => {
         }
 
         let redirectUri = `${constants.DISCORD_URL_BOT_HOST}/authorize`;
-        let res = webhooks.makeHookUrl(code, redirectUri);
-        webhooks.subscribe(res);
-        res.json({ msg: 'Success' });
+        let resHook = await webhooks.makeHookUrl(code, redirectUri);
+        webhooks.subscribe(resHook.url);
+        res.status(200).json({ msg: 'Success' });
     } catch (error) {
-        logger.error(error);
+        logger.error(error.message);
         res.status(500).json({ msg: 'Failed. something error occured' });
     }
 });
 
-app.listen(9292, () => {
+app.listen(80, () => {
     console.log('서버 작동중');
 });

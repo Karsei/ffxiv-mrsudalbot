@@ -14,23 +14,28 @@ const news = require('./news');
 let count = 0;
 
 const webhooks = {
-    subscribe: async (pParams, pUrl) => {
+    subscribe: async (pUrl, pParams) => {
+        pParams = pParams || {};
+        
         // Redis에 Webhook 등록
         // 나라별
         Object.keys(categories.Korea).map(type => {
-            redis.sadd(`ko-${type}-webhooks`, pUrl); 
+            redis.sadd(`ko-${type}-webhooks`, pUrl);
         });
 
         // 전체
-        if (!redis.sismembers('all-webhooks', pUrl)) {
-            redis.sadd(`all-webhooks`, pUrl);
-            logger.info(`${pUrl} 등록 완료`);
-        }
+        redis.sismember('all-webhooks', pUrl, (err, reply) => {
+            if (err) throw err;
+            if (!reply) {
+                redis.sadd(`all-webhooks`, pUrl);
+                logger.info(`${pUrl} 등록 완료`);
+            }
+        });
     },
 
     makeHookUrl: async (pCode, pRedirectUri) => {
         let res = await discordUtil.createWebhook(pCode, pRedirectUri);
-        return { url: `${constants.DISCORD_URL_WEBHOOK}/${res.data.id}/${res.data.token}`, hookData: res.data };
+        return { url: `${constants.DISCORD_URL_WEBHOOK}/${res.data.webhook.id}/${res.data.webhook.token}`, hookData: res.data };
     },
     
     newsExecute: async (pType, pCategory, pLocale) => {
@@ -113,7 +118,7 @@ const embedMsgTemplate = {
 
 const redisUtil = {
     postCache: (pData, pLocale, pType) => {
-        pData.filter(e => redis.sadd(`${pLocale}-${pType}-ids`, pData.idx)).sort((a, b) => b.timestamp - a.timestamp);
+        pData.filter(e => redis.sadd(`${pLocale}-${pType}-ids`, e.idx)).sort((a, b) => b.timestamp - a.timestamp);
     }
 }
 
@@ -165,20 +170,15 @@ const discordUtil = {
 
     createWebhook: (pCode, pRedirectUri) => {
         // https://discord.com/developers/docs/resources/webhook#webhook-object
+        let makeData = `client_id=${constants.DISCORD_BOT_CLIENT_ID}&client_secret=${constants.DISCORD_BOT_CLIENT_SECRET}&grant_type=authorization_code&code=${pCode}&redirect_uri=${pRedirectUri}`
         return axios({
             method: 'POST',
             url: constants.DISCORD_URL_OAUTH_TOKEN,
             headers: {
                 'Content-Type': 'application/x-www-form-urlencoded'
             },
-            data: {
-                client_id: constants.DISCORD_BOT_CLIENT_ID, 
-                client_secret: constants.DISCORD_BOT_CLIENT_SECRET, 
-                grant_type: 'authorization_code', 
-                code: pCode, 
-                redirect_uri: pRedirectUri,
-            },
-        });
+            data: makeData,
+        }).catch(err => logger.error(err));
     },
 };
 
