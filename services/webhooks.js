@@ -71,15 +71,20 @@ const webhooks = {
 
         // 3. REDIS에서 모든 등록된 웹훅 주소를 불러온 후, Embed는 10개씩 한 묶음으로, Webhook은 20개씩 한 묶음으로 구성해서 전송한다.
         // 이때 Discord 웹훅 제한이 걸릴 수 있으므로 주의할 것
-        let whList = redis.smembers(`${locale}-${type}-webhooks`);
-        let subcount = 0;
-        while (newEmbedPosts.length) {
-            let posts = { embeds: newEmbedPosts.splice(0, 2) };
-            if (subcount > 2) break;
-            subcount++;
+        redis.smembers(`${locale}-${type}-webhooks`, (err, reply) => {
+            if (err) throw err;
+            let whList = reply;
 
-            //discordUtil.sendMessage('', posts);
-        }
+            console.info(whList);
+            let subcount = 0;
+            while (newEmbedPosts.length) {
+                let posts = { embeds: newEmbedPosts.splice(0, 2) };
+                if (subcount > 2) break;
+                subcount++;
+
+                //discordUtil.sendMessage('', posts);
+            }
+        });
     },
     newsExecuteAll: () => {
         let jobs = [];
@@ -118,7 +123,10 @@ const embedMsgTemplate = {
 
 const redisUtil = {
     postCache: (pData, pLocale, pType) => {
-        pData.filter(e => redis.sadd(`${pLocale}-${pType}-ids`, e.idx)).sort((a, b) => b.timestamp - a.timestamp);
+        return pData.filter(e => {
+            redis.sadd(`${pLocale}-${pType}-ids`, e.idx);
+            return e;
+        }).sort((a, b) => b.timestamp - a.timestamp);
     }
 }
 

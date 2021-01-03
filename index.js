@@ -149,7 +149,7 @@ r.on('line', async (line) => {
                     break;
                 }
                 case 'parse': {
-                    let res = await news.fetchAll('na');
+                    let res = await news.fetchGlobal('topics', 'na', false);
                     console.log(res);
                     break;
                 }

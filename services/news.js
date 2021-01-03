@@ -6,6 +6,7 @@ const axios = require('axios');
 
 const constants = require('../config/constants');
 const categories = require('../config/categories');
+const redis = require('../libs/redis');
 
 /**
  * 소식 모음
@@ -16,7 +17,13 @@ const news = {
      */
     fetchGlobal: async (pType, pLocale, pSkipCache) => {
         pSkipCache = pSkipCache || false;
-        return await parser.parseGlobal(categories.Global[pType].url, pType, pLocale);
+        if (pSkipCache) {
+            return await newsCache.getCache(pType, pLocale);
+        } else {
+            let data = await parser.parseGlobal(categories.Global[pType].url, pType, pLocale);
+            newsCache.setCache(JSON.stringify(data), pType, pLocale);
+            return data;
+        }
     },
 
     /**
@@ -31,7 +38,13 @@ const news = {
      */
     fetchKorea: async (pType, pSkipCache) => {
         pSkipCache = pSkipCache || false;
-        return await parser.parseKorea(categories.Korea[pType].url, pType);
+        if (pSkipCache) {
+            return await newsCache.getCache(pType, 'ko');
+        } else {
+            let data = await parser.parseKorea(categories.Korea[pType].url, pType);
+            newsCache.setCache(JSON.stringify(data), pType, 'ko');
+            return data;
+        }
     },
 
     /**
@@ -48,6 +61,22 @@ const news = {
         return { global: await news.fetchGlobalAll(pLocale), korea: await news.fetchKoreaAll() };
     }
 };
+
+const newsCache = {
+    setCache: (pNews, pType, pLocale) => {
+        redis.hset(`${pLocale}-news-data`, pType, pNews);
+        redis.hset(`${pLocale}-news-timestamp`, pType, new Date());
+    },
+    getCache: async (pType, pLocale) => {
+        let redisData = await new Promise((resolve, reject) => {
+            redis.hget(`${pLocale}-news-data`, pType, (err, reply) => {
+                if (err) throw err;
+                resolve(reply);
+            });
+        });
+        return redisData;
+    },
+}
 
 /**
  * 파싱 분류
