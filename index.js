@@ -50,16 +50,16 @@ discordBot.on('message', async (message) => {
             // 종료
             case `EXIT`:
             case `종료`:
-                client.commands.get('exit').execute(message, args);
+                discordBot.commands.get('exit').execute(message, args);
                 break;
             // 업타임
             case `UPTIME`:
             case `업타임`:
-                client.commands.get('uptime').execute(message, args);
+                discordBot.commands.get('uptime').execute(message, args);
                 break;
             case `ECHO`:
             case `말하기`:
-                client.commands.get('echo').execute(message, args);
+                discordBot.commands.get('echo').execute(message, args);
                 break;
         }
     }
@@ -68,6 +68,10 @@ discordBot.on('message', async (message) => {
 discordBot.on('guildCreate', async (guild) => {
     try {
         let serverId = guild.id;
+        let serverName = guild.name;
+        let serverRegion = guild.region;
+        
+        logger.info(`[${serverRegion}] ${serverName} (${serverId}) - 서버에 봇 추가됨`);
 
             // 채널 추가
             // let defChannel;

@@ -1,3 +1,5 @@
+let oStartDate = new Date();
+
 module.exports = {
     name: 'uptime',
     description: 'Shows server uptime',
