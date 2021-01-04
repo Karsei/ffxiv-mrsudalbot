@@ -69,14 +69,6 @@ discordBot.on('guildCreate', async (guild) => {
     try {
         let serverId = guild.id;
 
-        redis.sismember('all-guilds', serverId, (err, reply) => {
-            if (err) throw err;
-            if (!reply) {
-                // 서버 추가
-                redis.sadd(`all-guilds`, serverId);
-            }
-        });
-
             // 채널 추가
             // let defChannel;
             // guild.channels.create('달달이', {

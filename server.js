@@ -39,7 +39,7 @@ app.get('/authorize', async (req, res) => {
 
         let redirectUri = `${constants.DISCORD_URL_BOT_HOST}/authorize`;
         let resHook = await webhooks.makeHookUrl(code, redirectUri);
-        webhooks.subscribe(resHook.url);
+        webhooks.subscribe(resHook.url, { guild_id: req.query.guild_id });
         res.status(200).json({ msg: 'Success' });
     } catch (error) {
         logger.error(error.message);

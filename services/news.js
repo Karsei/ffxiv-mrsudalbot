@@ -1,6 +1,7 @@
 /**
  * [서비스] 소식
  */
+const { promisify } = require('util');
 const cheerio = require('cheerio');
 const axios = require('axios');
 
@@ -15,14 +16,20 @@ const news = {
     /**
      * 특정 글로벌 소식
      */
-    fetchGlobal: async (pType, pLocale, pSkipCache) => {
-        pSkipCache = pSkipCache || false;
-        if (pSkipCache) {
-            return await newsCache.getCache(pType, pLocale);
+    fetchGlobal: async (pType, pLocale, pSkipCache = false) => {
+        let outdate = await newsCache.isOutDate(pType, pLocale);
+        if (pSkipCache || outdate) {
+            try {
+                let data = await parser.parseGlobal(categories.Global[pType].url, pType, pLocale);
+                newsCache.setCache(JSON.stringify(data), pType, pLocale);
+                return data;
+            } catch (e) {
+                let data = await newsCache.getCache(pType, pLocale);
+                return JSON.parse(data);
+            }
         } else {
-            let data = await parser.parseGlobal(categories.Global[pType].url, pType, pLocale);
-            newsCache.setCache(JSON.stringify(data), pType, pLocale);
-            return data;
+            let data = await newsCache.getCache(pType, pLocale);
+            return JSON.parse(data);
         }
     },
 
@@ -36,14 +43,20 @@ const news = {
     /**
      * 특정 한국 소식
      */
-    fetchKorea: async (pType, pSkipCache) => {
-        pSkipCache = pSkipCache || false;
-        if (pSkipCache) {
-            return await newsCache.getCache(pType, 'ko');
+    fetchKorea: async (pType, pSkipCache = false) => {
+        let outdate = await newsCache.isOutDate(pType, 'ko');
+        if (pSkipCache || outdate) {
+            try {
+                let data = await parser.parseKorea(categories.Korea[pType].url, pType);
+                newsCache.setCache(JSON.stringify(data), pType, 'ko');
+                return data;
+            } catch (e) {
+                let data = await newsCache.getCache(pType, 'ko');
+                return JSON.parse(data);
+            }
         } else {
-            let data = await parser.parseKorea(categories.Korea[pType].url, pType);
-            newsCache.setCache(JSON.stringify(data), pType, 'ko');
-            return data;
+            let data = await newsCache.getCache(pType, 'ko');
+            return JSON.parse(data);
         }
     },
 
@@ -63,18 +76,26 @@ const news = {
 };
 
 const newsCache = {
+    CACHE_EXPIRE_IN: 600,
     setCache: (pNews, pType, pLocale) => {
         redis.hset(`${pLocale}-news-data`, pType, pNews);
-        redis.hset(`${pLocale}-news-timestamp`, pType, new Date());
+        redis.hset(`${pLocale}-news-timestamp`, pType, new Date().getTime());
     },
     getCache: async (pType, pLocale) => {
-        let redisData = await new Promise((resolve, reject) => {
-            redis.hget(`${pLocale}-news-data`, pType, (err, reply) => {
-                if (err) throw err;
-                resolve(reply);
-            });
-        });
-        return redisData;
+        const getAsync = promisify(redis.hget).bind(redis);
+        let data = await getAsync(`${pLocale}-news-data`, pType);
+        return data;
+    },
+    getCacheHeaders: async (pType, pLocale) => {
+        const getAsync = promisify(redis.hget).bind(redis);
+        let lastModified = await getAsync(`${pLocale}-news-timestamp`, pType);
+        return lastModified;
+    },
+    isOutDate: async (pType, pLocale) => {
+        const getAsync = promisify(redis.hget).bind(redis);
+        let timestamp = await getAsync(`${pLocale}-news-timestamp`, pType);
+        let cacheTime = timestamp ? timestamp : new Date(0).getTime();
+        return new Date().getTime() > (parseInt(cacheTime) + newsCache.CACHE_EXPIRE_IN);
     },
 }
 
