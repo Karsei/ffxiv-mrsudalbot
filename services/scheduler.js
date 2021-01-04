@@ -11,7 +11,7 @@ const scheduler = {
             webhooks.newsExecuteAll();
         }, { timezone: 'Asia/Seoul' });
         let wsCron = cron.schedule('0,10,20,30,40,50 * * * *', () => {
-            console.log('webhook resend');
+            webhooks.newsExecuteResendAll();
         }, { timezone: 'Asia/Seoul' });
 
         wCron.start();
