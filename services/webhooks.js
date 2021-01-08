@@ -128,7 +128,7 @@ const webhooks = {
             if (result.removed > 0)     logger.info(`${result.removed}개의 Webhook이 제거되었음`);
             if (result.fail > 0)        logger.info(`${result.fail}개의 Webhook이 전송하는데 실패하였음`);
             if (result.limited > 0)     logger.info(`${result.limited}개의 Webhook이 전송하는데 제한 걸림`);
-            logger.info(`총 ${numUrls}개의 Webhook을 이용하여 '${pLocale}' 언어로 총 ${originNewPosts}개 중 ${result.success}개의 ${pType} 게시글이 갱신됨`);
+            logger.info(`총 ${originNewPosts}개의 ${pType} ('${pLocale}') 게시글을 총 ${numUrls}개의 Webhook 중에서 ${result.success}개가 전송하는데 성공함`);
         });
     },
     newsExecuteAll: () => {

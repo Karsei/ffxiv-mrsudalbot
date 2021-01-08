@@ -31,6 +31,9 @@ const constants = {
 
     // 채팅 명령어 접두사
     DISCORD_CHAT_PREFIX: ';!',
+
+    // FFLogs 웹 토큰
+    FFLOGS_WEB_TOKEN: '',
 };
 
 module.exports = constants;

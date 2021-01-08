@@ -39,7 +39,14 @@ const news = {
      * 전체 글로벌 소식
      */
     fetchGlobalAll: async (pLocale) => {
-        return Promise.all(Object.keys(categories.Global).map((e) => news.fetchGlobal(e, pLocale)));
+        // Promise.all 로 하면 429 오류가 뜨면서 요청이 많다고 뜨므로 하나씩 해주자
+        let results = [];
+        let globalCategories = Object.keys(categories.Global);
+        for (let idx in globalCategories) {
+            results.push(await news.fetchGlobal(globalCategories[idx], pLocale));
+        }
+        return results;
+        // return Promise.all(Object.keys(categories.Global).map((e) => news.fetchGlobal(e, pLocale)));
     },
 
     /**
@@ -68,7 +75,14 @@ const news = {
      * 전체 한국 소식
      */
     fetchKoreaAll: async () => {
-        return Promise.all(Object.keys(categories.Korea).map((e) => news.fetchKorea(e)));
+        // Promise.all 로 하면 429 오류가 뜨면서 요청이 많다고 뜨므로 하나씩 해주자
+        let results = [];
+        let koreaCategories = Object.keys(categories.Korea);
+        for (let idx in koreaCategories) {
+            results.push(await news.fetchKorea(koreaCategories[idx]));
+        }
+        return results;
+        // return Promise.all(Object.keys(categories.Korea).map((e) => news.fetchKorea(e)));
     },
 
     /**
@@ -145,6 +159,24 @@ const parser = {
             default:
                 return parseUtil.global.news(pageData, localeBaseUrl);
         };
+    },
+
+    parseKoreaSubs: async (pUrl, pSubType) => {
+        let pageData = await axios.get(pUrl);
+        pageData = cheerio.load(pageData.data);
+        switch (pSubType) {
+            default:
+                return;
+        }
+    },
+
+    parseGlobalSubs: async (pUrl, pSubType) => {
+        let pageData = await axios.get(pUrl);
+        pageData = cheerio.load(pageData.data);
+        switch (pSubType) {
+            default:
+                return;
+        }
     },
 };
 
