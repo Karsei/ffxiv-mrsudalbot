@@ -192,42 +192,52 @@ const ratePromise = (pHookUrl, pPost, pLocale, pType) => {
         await discordUtil.sendMessage(pHookUrl, pPost)
             .then(async res => {
                 // 너무 많이 보낸 경우 미리 딜레이를 줌
-                if (res.response.headers['x-ratelimit-remaining'] == '0') {
-                    let time = (parseInt(res.response.headers['x-ratelimit-reset']) * 1000) - (new Date().getTime());
+                if (res.headers['x-ratelimit-remaining'] == '0') {
+                    let time = (parseInt(res.headers['x-ratelimit-reset']) * 1000) - (new Date().getTime());
                     if (time > 0) {
                         await Promise.delay(time + 1000);
                     }
                 }
                 resolve('success');
             }).catch(async err => {
-                logger.error(err);
-                let hookUrl = err.config.url;
+                if (!err) {
+                    logger.error('something wrong');
+                    resolve('fail');
+                } else if (!err.config) {
+                    console.error('no err config', err);
+                    logger.error('something wrong2');
+                    resolve('fail');
+                } else {
+                    logger.error(err.config);
+                    logger.error(err.response);
+                    let hookUrl = err.config.url;
 
-                // 정상 요청이 아님
-                if (err.response.status === 400) {
-                    if (err.response.data) {
-                        // Webhook 제거됨
-                        if (err.response.data.code === 10015) {
-                            redis.srem(`${pLocale}-${pType}-webhooks`, hookUrl);
-                            resolve('removed');
+                    // 정상 요청이 아님
+                    if (err.response.status === 400) {
+                        if (err.response.data) {
+                            // Webhook 제거됨
+                            if (err.response.data.code === 10015) {
+                                redis.srem(`${pLocale}-${pType}-webhooks`, hookUrl);
+                                resolve('removed');
+                            } else {
+                                await redisUtil.addResendItem(hookUrl, pPost, pLocale, pType);
+                                resolve('fail');
+                            }
                         } else {
+                            logger.error('something error occured');
                             await redisUtil.addResendItem(hookUrl, pPost, pLocale, pType);
                             resolve('fail');
                         }
+                    // 요청을 너무 많이 보냄
+                    } else if (err.response.status === 429) {
+                        await Promise.delay(err.response.data.retry_after);
+                        await redisUtil.addResendItem(hookUrl, pPost, pLocale, pType);
+                        resolve('limited');
+                    // 그 외
                     } else {
-                        logger.error('something error occured');
                         await redisUtil.addResendItem(hookUrl, pPost, pLocale, pType);
                         resolve('fail');
                     }
-                // 요청을 너무 많이 보냄
-                } else if (err.response.status === 429) {
-                    await Promise.delay(err.response.data.retry_after);
-                    await redisUtil.addResendItem(hookUrl, pPost, pLocale, pType);
-                    resolve('limited');
-                // 그 외
-                } else {
-                    await redisUtil.addResendItem(hookUrl, pPost, pLocale, pType);
-                    resolve('fail');
                 }
             });
     });
@@ -252,6 +262,10 @@ const embedMsgTemplate = {
 
 const redisUtil = {
     postCache: async (pData, pLocale, pType) => {
+        if (!pData) {
+            logger.warn('something wrong');
+            return [];
+        }
         const saddAsync = promisify(redis.sadd).bind(redis);
         
         let propSet = {};

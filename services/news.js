@@ -24,6 +24,8 @@ const news = {
                 newsCache.setCache(JSON.stringify(data), pType, pLocale);
                 return data;
             } catch (e) {
+                console.error('Fetching Global Error');
+                console.error(e.toJSON());
                 let data = await newsCache.getCache(pType, pLocale);
                 return JSON.parse(data);
             }
@@ -51,6 +53,8 @@ const news = {
                 newsCache.setCache(JSON.stringify(data), pType, 'ko');
                 return data;
             } catch (e) {
+                console.error('Fetching Korea Error');
+                console.error(e.toJSON());
                 let data = await newsCache.getCache(pType, 'ko');
                 return JSON.parse(data);
             }
@@ -115,6 +119,12 @@ const parser = {
                 return parseUtil.korea.patchNote(pageData, localeBaseUrl);
             case 'event':
                 return parseUtil.korea.event(pageData, localeBaseUrl);
+            case 'maintenance':
+                return parseUtil.korea.maintenance(pageData, localeBaseUrl);
+            case 'updates':
+                return parseUtil.korea.update(pageData, localeBaseUrl);
+            case 'notices':
+                return parseUtil.korea.notice(pageData, localeBaseUrl);
             default:
                 return parseUtil.korea.news(pageData, localeBaseUrl);
         };
@@ -223,6 +233,69 @@ const parseUtil = {
                     parseDetail.title = $title.find('strong').html().replace(/([\r\n|\n|\r])/gm, '').trim();
                     parseDetail.url = `${pLocaleBaseUrl}${$title.find('a').attr('href')}`;
                     
+                    list.push(parseDetail);
+                });
+            }
+            return list;
+        },
+        notice: ($, pLocaleBaseUrl) => {
+            let list = [];
+            let $targetTable = $('.ff14_board_list');
+            let $list = $targetTable.find('tr');
+            if ($list && $list.length > 0) {
+                $list.each(function (idx, data) {
+                    if ($(this).find('th').length > 0)  return true;
+
+                    let parseDetail = {};
+                    parseDetail.idx = $(this).find('td.num').html();
+
+                    let $title = $(this).find('td span.title');
+                    parseDetail.title = $title.find('strong').html().replace(/([\r\n|\n|\r])/gm, '').trim();
+                    parseDetail.url = `${pLocaleBaseUrl}${$title.find('a').attr('href')}`;
+                    parseDetail.thumbnail = 'http://static.ff14.co.kr/Contents/2019/04/0B93217EE978FE3F5AFFD847A20A55D20FF200821CBB6124AFDFEC38384E2FC8.jpg';
+
+                    list.push(parseDetail);
+                });
+            }
+            return list;
+        },
+        maintenance: ($, pLocaleBaseUrl) => {
+            let list = [];
+            let $targetTable = $('.ff14_board_list');
+            let $list = $targetTable.find('tr');
+            if ($list && $list.length > 0) {
+                $list.each(function (idx, data) {
+                    if ($(this).find('th').length > 0)  return true;
+
+                    let parseDetail = {};
+                    parseDetail.idx = $(this).find('td.num').html();
+
+                    let $title = $(this).find('td span.title');
+                    parseDetail.title = $title.find('strong').html().replace(/([\r\n|\n|\r])/gm, '').trim();
+                    parseDetail.url = `${pLocaleBaseUrl}${$title.find('a').attr('href')}`;
+                    parseDetail.thumbnail = 'http://static.ff14.co.kr/Contents/2019/07/97809A6EB08E63368C57F973277459AD7AC75C71426E2D0B0613FE636FA63706.jpg';
+
+                    list.push(parseDetail);
+                });
+            }
+            return list;
+        },
+        update: ($, pLocaleBaseUrl) => {
+            let list = [];
+            let $targetTable = $('.ff14_board_list');
+            let $list = $targetTable.find('tr');
+            if ($list && $list.length > 0) {
+                $list.each(function (idx, data) {
+                    if ($(this).find('th').length > 0)  return true;
+
+                    let parseDetail = {};
+                    parseDetail.idx = $(this).find('td.num').html();
+
+                    let $title = $(this).find('td span.title');
+                    parseDetail.title = $title.find('strong').html().replace(/([\r\n|\n|\r])/gm, '').trim();
+                    parseDetail.url = `${pLocaleBaseUrl}${$title.find('a').attr('href')}`;
+                    parseDetail.thumbnail = 'http://static.ff14.co.kr/Contents/2015/10/2015103017255463465.jpg';
+
                     list.push(parseDetail);
                 });
             }
