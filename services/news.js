@@ -7,6 +7,7 @@ const axios = require('axios');
 
 const constants = require('../config/constants');
 const categories = require('../config/categories');
+const logger = require('../libs/logger');
 const redis = require('../libs/redis');
 
 /**
@@ -46,7 +47,6 @@ const news = {
             results.push(await news.fetchGlobal(globalCategories[idx], pLocale));
         }
         return results;
-        // return Promise.all(Object.keys(categories.Global).map((e) => news.fetchGlobal(e, pLocale)));
     },
 
     /**
@@ -82,7 +82,6 @@ const news = {
             results.push(await news.fetchKorea(koreaCategories[idx]));
         }
         return results;
-        // return Promise.all(Object.keys(categories.Korea).map((e) => news.fetchKorea(e)));
     },
 
     /**
@@ -90,7 +89,7 @@ const news = {
      */
     fetchAll: async (pLocale) => {
         return { global: await news.fetchGlobalAll(pLocale), korea: await news.fetchKoreaAll() };
-    }
+    },
 };
 
 const newsCache = {
@@ -156,24 +155,43 @@ const parser = {
                 return parseUtil.global.topics(pageData, localeBaseUrl);
             case 'developers':
                 return parseUtil.global.developerBlog(pageData);
+            case 'maintenance':
+                return parseUtil.global.maintenance(pageData, localeBaseUrl, pLocale);
             default:
                 return parseUtil.global.news(pageData, localeBaseUrl);
         };
     },
 
+    /**
+     * 한국 하위 파싱
+     * 
+     * @param {string} pUrl 파싱 URL
+     * @param {string} pSubType 종류
+     */
     parseKoreaSubs: async (pUrl, pSubType) => {
         let pageData = await axios.get(pUrl);
         pageData = cheerio.load(pageData.data);
         switch (pSubType) {
+            case 'maintenance':
+                return parseUtil.korea.subMaintenance(pageData);
             default:
                 return;
         }
     },
 
-    parseGlobalSubs: async (pUrl, pSubType) => {
+    /**
+     * 글로벌 하위 파싱
+     * 
+     * @param {string} pUrl 파싱 URL
+     * @param {string} pSubType 종류
+     * @param {string} pLocale 언어
+     */
+    parseGlobalSubs: async (pUrl, pSubType, pLocale) => {
         let pageData = await axios.get(pUrl);
         pageData = cheerio.load(pageData.data);
         switch (pSubType) {
+            case 'maintenance':
+                return parseUtil.global.subMaintenance(pageData, pLocale);
             default:
                 return;
         }
@@ -227,6 +245,31 @@ const parseUtil = {
             }
             return list;
         },
+        maintenance: async ($, pLocaleBaseUrl, pLocale) => {
+            let list = [];
+            let $targetTable = $('.news__content');
+            let $list = $targetTable.find('li.news__list');
+            if ($list && $list.length > 0) {
+                $list.each(function (idx, data) {
+                    let parseDetail = {};
+
+                    let url = $(this).find('a').attr('href');
+                    parseDetail.idx = url.match(/[^/]+$/)[0];
+                    parseDetail.url = `${pLocaleBaseUrl}${url}`;
+                    parseDetail.title = $(this).find('p.news__list--title').text().replace(/(\[.*\])|(\r\n|\n|\r)/gm, '').trim();
+                    parseDetail.timestamp = $(this).find('script').html().match(/ldst_strftime\((\d+)./)[1] * 1000;
+                    
+                    list.push(parseDetail);
+                });
+
+                for (let idx in list) {
+                    if (list[idx].url) {
+                        list[idx].description = await parser.parseGlobalSubs(list[idx].url, 'maintenance', pLocale);
+                    }
+                }
+            }
+            return list;
+        },
         developerBlog: ($) => {
             let list = [];
             let $list = $('entry');
@@ -248,6 +291,68 @@ const parseUtil = {
             }
             return list;
         },
+        subMaintenance: ($, pLocale) => {
+            let content = '';
+            let textBox = $('.news__detail__wrapper');
+            if (textBox.length > 0) {
+                const TIMESTAMP_REGEX = {
+                    'jp': /日　時：(.*)より(?:[\r\n|\r|\n]?)(.*:[\d]{2})/gmi,
+                    'na': /(\w{3}\.? \d{1,2}, \d{4})? (?:from )?(\d{1,2}:\d{2}(?: [ap]\.m\.)?)(?: \((\w+)\))?/gi,
+                    'eu': /(\w{3}\.? \d{1,2}, \d{4})? (?:from )?(\d{1,2}:\d{2}(?: [ap]\.m\.)?)(?: \((\w+)\))?/gi,
+                    'de': /(\d{1,2}\. \w{3}\.? \d{4})? (?:von |um )?(\d{1,2}(?::\d{2})? Uhr)(?: \((\w+)\))?/gi,
+                };
+                // const I18N_MONTHS = {
+                //     'de': { 'Jan': 'Jan', 'Feb': 'Feb', 'Mär': 'Mar', 'Apr': 'Apr', 'Mai': 'May', 'Jun': 'Jun', 'Jul': 'Jul', 'Aug': 'Aug', 'Sep': 'Sep', 'Okt': 'Oct', 'Nov': 'Nov', 'Dez': 'Dec' },
+                // };
+                // const I18N_DAYS = {
+                //     'de': { 'So': 'Sun', 'Mo': 'Mon', 'Di': 'Tue', 'Mi': 'Wed', 'Do': 'Thu', 'Fr': 'Fri', 'Sa': 'Sat' },
+                // };
+
+                let text = textBox.text();
+                let parseText = {
+                    'start': '',
+                    'end': '',
+                };
+
+                let m = null;
+                let regex = TIMESTAMP_REGEX[pLocale];
+
+                if (pLocale == 'jp') {
+                    let breakOver = false;
+                    while ((m = regex.exec(text)) !== null) {
+                        if (m.index === regex.lastIndex) {
+                            regex.lastIndex++;
+                        }
+                        if (breakOver)  break;
+                        breakOver = true;
+                        
+                        if (m[1])   parseText['start'] = (m[1] || '').trim();
+                        if (m[2])   parseText['end'] = (m[2] || '').trim();
+                    }
+
+                    
+                } else {
+                    let countOver = 0;
+                    while ((m = regex.exec(text)) !== null) {
+                        if (m.index === regex.lastIndex) {
+                            regex.lastIndex++;
+                        }
+                        if (countOver > 1)  break;
+                        if (countOver == 0) {
+                            if (m[0])   parseText['start'] = (m[0] || '').trim();
+                        } else {
+                            if (m[0])   parseText['end'] = (m[0] || '').trim();
+                        }
+                        countOver++;
+                    }
+                }
+
+                if (parseText['start'].length > 0)  content += `${parseText['start']}`;
+                if (parseText['end'].length > 0)  content += ` ~ ${parseText['end']}`;
+            }
+
+            return content;
+        }, 
     },
     korea: {
         news: ($, pLocaleBaseUrl) => {
@@ -291,7 +396,7 @@ const parseUtil = {
             }
             return list;
         },
-        maintenance: ($, pLocaleBaseUrl) => {
+        maintenance: async ($, pLocaleBaseUrl) => {
             let list = [];
             let $targetTable = $('.ff14_board_list');
             let $list = $targetTable.find('tr');
@@ -309,6 +414,12 @@ const parseUtil = {
 
                     list.push(parseDetail);
                 });
+
+                for (let idx in list) {
+                    if (list[idx].url) {
+                        list[idx].description = await parser.parseKoreaSubs(list[idx].url, 'maintenance');
+                    }
+                }
             }
             return list;
         },
@@ -377,6 +488,62 @@ const parseUtil = {
             }
             return list;
         },
+        subMaintenance: ($) => {
+            let content = '';
+            let textBox = $('.board_view_box');
+            if (textBox.length > 0) {
+                let text = textBox.text();
+
+                let list = {
+                    date: [],
+                    content: [],
+                };
+                let countBreak = 0;
+                // 일시
+                let regex = /일시[ :-]+(.*)/gm;
+                let m = null;
+                while ((m = regex.exec(text)) !== null) {
+                    if (m.index === regex.lastIndex) {
+                        regex.lastIndex++;
+                    }
+                    if (m[1])   list.date.push((m[1] || '').trim());
+
+                    if (countBreak > 10) {
+                        logger.error('something error');
+                        break;
+                    }
+                    countBreak++;
+                }
+                // 내용
+                regex = /내용[ :-]+(.*)/gm;
+                m = null;
+                countBreak = 0;
+                while ((m = regex.exec(text)) !== null) {
+                    if (m.index === regex.lastIndex) {
+                        regex.lastIndex++;
+                    }
+                    if (m[1])   list.content.push((m[1] || '').trim());
+
+                    if (countBreak > 10) {
+                        logger.error('something error');
+                        break;
+                    }
+                    countBreak++;
+                }
+
+                let count = 1;
+                if (list.date.length == list.content.length) {
+                    for (let idx in list.date) {
+                        if (content.length > 0) content += `\n`;
+                        content += `${count++}. ${list.content[idx]}\n`;
+                        content += ` - ${list.date[idx]}`;
+                    }
+                } else {
+                    content += `${list.date[0]}`;
+                }
+            }
+            return content;
+        }, 
     },
 };
 
