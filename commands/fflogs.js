@@ -75,21 +75,25 @@ const cmds = {
                             parseStr += `${boss.name} - [Med: ${highestRDPSDetail.bestMedian}%][${highestRDPSDetail.useclass}] ${highestRDPSDetail.percentile}% (전체 ${highestRDPSDetail.parse}명), rDPS: ${highestRDPSDetail.rdps} ~ ${new Date(highestRDPSDetail.date).format('yyyy/MM/dd HH:mm:ss')}\n`;
                         }
 
-                        // 전송
-                        waitMsg.edit('', {
-                            embed: {
-                                color: parseInt('b6f542', 16),
-                                title: `[${searchInfo.server.toUpperCase()}] ${searchInfo.name}`,
-                                description: `각 인스턴스마다 가장 잘 나온 데이터를 집계한 정보입니다.`,
-                                fields: [
-                                    { name: '정보', value: parseStr },
-                                ],
-                                timestamp: new Date(),
-                                footer: {
-                                    text: 'FFXIV Service ToolBot'
+                        if (parseStr !== '') {
+                            // 전송
+                            waitMsg.edit('', {
+                                embed: {
+                                    color: parseInt('b6f542', 16),
+                                    title: `[${searchInfo.server.toUpperCase()}] ${searchInfo.name}`,
+                                    description: `각 인스턴스마다 가장 잘 나온 데이터를 집계한 정보입니다.`,
+                                    fields: [
+                                        { name: '정보', value: parseStr },
+                                    ],
+                                    timestamp: new Date(),
+                                    footer: {
+                                        text: 'FFXIV Service ToolBot'
+                                    }
                                 }
-                            }
-                        });
+                            });
+                        } else {
+                            waitMsg.edit('집계된 내역이 없어요!');
+                        }
                     } catch (e) {
                         waitMsg.edit('오류가 발생해서 보여드릴 수 없네요.. 잠시 후에 다시 시도해보세요.');
                         logger.error(e.stack);
