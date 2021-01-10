@@ -36,7 +36,7 @@ const cmds = {
             let types = Object.keys(fflogsConfig.BASE_DEFAULT_CATEGORIES);
             let tFound = false;
             for (let idx in types) {
-                if (fflogsConfig.BASE_DEFAULT_CATEGORIES[types[idx]].indexOf(searchInfo.type) > -1) {
+                if (types.indexOf(searchInfo.type) > -1) {
                     tFound = true;
                     break;
                 }
