@@ -4,7 +4,7 @@ require('date-utils');
 
 const logger = winston.createLogger({
     // 최소 레벨
-    // level: 'debug',
+    level: 'debug',
     // 출력
     transports: [
         // 파일 저장

@@ -313,6 +313,7 @@ const parseUtil = {
                     'start': '',
                     'end': '',
                 };
+                if (Object.keys(TIMESTAMP_REGEX).indexOf(pLocale) == -1) return '';
 
                 let m = null;
                 let regex = TIMESTAMP_REGEX[pLocale];
