@@ -1,19 +1,24 @@
 const constants = require('../config/constants');
+const fflogs = require('../services/fflogs');
 
-const cmds = [
-    {
-        cmd: 'search',
-        execute: (args) => {
-            message.channel.send(args.join(' '));
+const cmds = {
+    search: {
+        execute: (message, args) => {
+            if (!args || args.length < 3) {
+                message.channel.send(`명령어가 올바르지 않아요!`);
+                return;
+            }
+            console.log('good!');
+            console.log(args.join(' '));
         },
-    }
-];
+    },
+};
 
 const cmdsUtil = {
     isExistCommand: (pArgs, pCmd) => {
-        if (!args)                      return false;
+        if (!pArgs)                     return false;
         if (!Array.isArray(pArgs))      return false;
-        return cmds.some(e => e.cmd === pCmd);
+        return pArgs.some(e => e === pCmd);
     },
 };
 
@@ -21,24 +26,28 @@ module.exports = {
     name: 'fflogs',
     description: 'Shows fflogs statistics',
     execute(message, args) {
-        message.channel.send('개발자가 현재 작업하고 있대요!');
-        // if (!args || (Array.isArray(args) && args[0] && cmdsUtil.isExistCommand(args[0]))) {
-        //     message.channel.send({
-        //         embed: {
-        //             color: parseInt('ff867d', 16),
-        //             title: '프프로그 명령어 안내',
-        //             description: `최종 콘텐츠를 기준으로 가장 잘 나온 정보를 조회합니다.`,
-        //             fields: [
-        //                 { name: '사용법', value: `${constants.DISCORD_CHAT_PREFIX}fflogs search <이름> <서버> <인스턴스종류>` }
-        //             ],
-        //             timestamp: new Date(),
-        //             // footer: {
-        //             //     text: DISCORD_TITLE_ABB
-        //             // }
-        //         }
-        //     });
+        const command = args.shift().toLowerCase();
 
-        //     return;
-        // }
+        if (!args || (command && !cmdsUtil.isExistCommand(Object.keys(cmds), command))) {
+            message.channel.send('', {
+                embed: {
+                    color: parseInt('ff867d', 16),
+                    title: '프프로그 명령어 안내',
+                    description: `프프로그 관련 명령어를 실행합니다.`,
+                    fields: [
+                        { name: '사용법', value: `${constants.DISCORD_CHAT_PREFIX}fflogs [search] <서버[carbuncle|chocobo|...]> <이름[홍길동]> <인스턴스종류[raid|24raid|trial|...]>` }
+                    ],
+                    timestamp: new Date(),
+                    footer: {
+                        text: 'FFXIV Service ToolBot'
+                    },
+                }
+            });
+            return;
+        }
+
+        if ('search' === command) {
+            cmds[command].execute(message, args);
+        }
     }
 };
