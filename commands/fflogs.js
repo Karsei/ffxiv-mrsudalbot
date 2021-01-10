@@ -8,18 +8,54 @@ const fflogs = require('../services/fflogs');
 const cmds = {
     search: {
         execute: async (message, args) => {
-            if (!args || args.length < 3) {
-                message.channel.send(`명령어가 올바르지 않아요!`);
+            if (!args || args.length < 4) {
+                message.channel.send('', {
+                    embed: {
+                        color: parseInt('ff867d', 16),
+                        title: '프프로그 검색 명령어 안내',
+                        description: `특정 컨텐츠의 각 인스턴스별 가장 잘 나온 데이터를 집계한 정보를 출력합니다.`,
+                        fields: [
+                            { name: '사용법', value: `${constants.DISCORD_CHAT_PREFIX}fflogs search <인스턴스종류> <지역> <서버> <닉네임>` },
+                            { name: '파라미터', value: `인스턴스졷류 - ${Object.keys(fflogsConfig.BASE_DEFAULT_CATEGORIES).join(', ')}\n지역 - kr, na, jp, fr\n서버 - moogle, carbuncle, mandragora, aegis, titan, ...` },
+                            { name: '예시', value: `- ${constants.DISCORD_CHAT_PREFIX}fflogs search raid jp titan Hong Guildong\n - ${constants.DISCORD_CHAT_PREFIX}fflogs search trial kr moogle 홍길동` },
+                        ],
+                        timestamp: new Date(),
+                        footer: {
+                            text: 'FFXIV Service ToolBot'
+                        },
+                    }
+                });
                 return;
             }
 
             // 검색 파라미터 준비
             let searchInfo = {
-                server: args[0],
-                userName: args[1],
-                type: args[2],
-                region: 'kr',
+                type: args[0].toLowerCase(),
+                region: args[1].toLowerCase(),
+                server: args[2].toLowerCase(),
+                userName: args[4] ? `${args[3].toLowerCase()} ${args[4].toLowerCase()}` : args[3].toLowerCase(), 
             };
+
+            // 타입 체크
+            let types = Object.keys(fflogsConfig.BASE_DEFAULT_CATEGORIES);
+            if (types.indexOf(searchInfo.type) === -1) {
+                message.channel.send(`종류가 올바르지 않아요!\n예시: ${types.join(', ')}`);
+                return;
+            }
+
+            // 지역 체크
+            let regions = Object.keys(fflogsConfig.BASE_REGION_I18N);
+            let rFound = false;
+            for (let idx in regions) {
+                if (fflogsConfig.BASE_REGION_I18N[regions[idx]].indexOf(searchInfo.region) > -1) {
+                    rFound = true;
+                    break;
+                }
+            }
+            if (!sFound) {
+                message.channel.send(`지역이 올바르지 않아요!\n예시: kr, na, jp, fr`);
+                return;
+            }
 
             // 서버 체크
             let servers = Object.keys(fflogsConfig.BASE_REGION_SERVERS);
@@ -32,20 +68,6 @@ const cmds = {
             }
             if (!sFound) {
                 message.channel.send(`서버가 올바르지 않아요!\n예시: carbuncle, chocobo, moogle, mandragora, ...`);
-                return;
-            }
-
-            // 타입 체크
-            let types = Object.keys(fflogsConfig.BASE_DEFAULT_CATEGORIES);
-            let tFound = false;
-            for (let idx in types) {
-                if (types.indexOf(searchInfo.type) > -1) {
-                    tFound = true;
-                    break;
-                }
-            }
-            if (!tFound) {
-                message.channel.send(`종류가 올바르지 않아요!\n\n예시: raid, 24raid, trial, trial_unreal, ultimate`);
                 return;
             }
 
@@ -126,7 +148,7 @@ module.exports = {
                     title: '프프로그 명령어 안내',
                     description: `프프로그 관련 명령어를 실행합니다.`,
                     fields: [
-                        { name: '사용법', value: `${constants.DISCORD_CHAT_PREFIX}fflogs [search] <서버[carbuncle|chocobo|...]> <이름[홍길동]> <인스턴스종류[raid|24raid|trial|...]>` }
+                        { name: '명령어 종류', value: `${constants.DISCORD_CHAT_PREFIX}fflogs [search]` },
                     ],
                     timestamp: new Date(),
                     footer: {
