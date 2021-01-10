@@ -14,7 +14,8 @@ const fflogs = {
         try {
             if (pSkipCache || outdate) {
                 zoneData = await fflogsUtil.getZone();
-                fflogsCache.setZone(JSON.stringify(zoneData.data));
+                zoneData = zoneData.data;
+                fflogsCache.setZone(JSON.stringify(zoneData));
             } else {
                 zoneData = await fflogsCache.getZone();
             }
@@ -167,7 +168,17 @@ const parser = {
             let lastData = null;
             for (let _idx = 0, _all = zoneData.partitions.length; _idx < _all; _idx++) {
                 if (zoneData.partitions[_idx].default) {
-                    if (zoneData.partitions[_idx].filtered_name && zoneData.partitions[_idx].filtered_name !== fflogsConfig.BASE_REGION_GAME_VERSION[userRegion])   continue;
+                    if (zoneData.partitions[_idx].filtered_name && zoneData.partitions[_idx].filtered_name !== fflogsConfig.BASE_REGION_GAME_VERSION[userRegion]) {
+                        let versions = zoneData.partitions[_idx].filtered_name.match(/([\d].[\d])?([\d].[\d])/gmi);
+                        if (versions) {
+                            let targetVersion = parseFloat(fflogsConfig.BASE_REGION_GAME_VERSION[userRegion]);
+                            let startVersion = parseFloat(versions[0]);
+                            let endVersion = versions[1] ? parseFloat(versions[1]) : startVersion;
+                            if (startVersion > targetVersion || targetVersion > endVersion) continue;
+                        } else {
+                            continue;
+                        }
+                    }
                     lastIdx = _idx + 1;
                     lastData = zoneData.partitions[_idx];
                 }

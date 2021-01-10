@@ -1,3 +1,5 @@
+require('date-utils');
+
 const constants = require('../config/constants');
 const fflogsConfig = require('../config/fflogs');
 const logger = require('../libs/logger');
@@ -52,7 +54,7 @@ const cmds = {
                 .then(async waitMsg => {
                     try {
                         let parseStr = '';
-                        let searchRes = await fflogs.fetchSearch(searchInfo);
+                        let searchRes = await fflogs.fetchSearch(searchInfo, true);
                         for (let idx in searchRes) {
                             let boss = searchRes[idx];
 
@@ -72,7 +74,7 @@ const cmds = {
 
                             // 줄바꿈
                             if (parseStr !== '')    parseStr += "\n";
-                            parseStr += `${boss.name} - [Med: ${highestRDPSDetail.bestMedian}%][${highestRDPSDetail.useclass}] ${highestRDPSDetail.percentile}% (전체 ${highestRDPSDetail.parse}명), rDPS: ${highestRDPSDetail.rdps} ~ ${new Date(highestRDPSDetail.date).format('yyyy/MM/dd HH:mm:ss')}\n`;
+                            parseStr += `${boss.name} - [Med: ${highestRDPSDetail.bestMedian}%][${highestRDPSDetail.useclass}] ${highestRDPSDetail.percentile}% (전체 ${highestRDPSDetail.parse}명), rDPS: ${highestRDPSDetail.rdps} ~ ${new Date(highestRDPSDetail.date).toFormat('YYYY-MM-DD HH24:MI:SS')}\n`;
                         }
 
                         if (parseStr !== '') {
@@ -80,7 +82,7 @@ const cmds = {
                             waitMsg.edit('', {
                                 embed: {
                                     color: parseInt('b6f542', 16),
-                                    title: `[${searchInfo.server.toUpperCase()}] ${searchInfo.name}`,
+                                    title: `[${searchInfo.server.toUpperCase()}] ${searchInfo.userName}`,
                                     description: `각 인스턴스마다 가장 잘 나온 데이터를 집계한 정보입니다.`,
                                     fields: [
                                         { name: '정보', value: parseStr },
