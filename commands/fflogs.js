@@ -20,20 +20,30 @@ const cmds = {
 
             // 서버 체크
             let servers = Object.keys(fflogsConfig.BASE_REGION_SERVERS);
+            let sFound = false;
             for (let idx in servers) {
-                if (fflogsConfig.BASE_REGION_SERVERS[servers[idx]].indexOf(searchInfo.server) === -1) {
-                    message.channel.send(`서버가 올바르지 않아요!\n\n예시: carbuncle, chocobo, moogle, mandragora, ...`);
-                    return;
+                if (fflogsConfig.BASE_REGION_SERVERS[servers[idx]].indexOf(searchInfo.server) > -1) {
+                    sFound = true;
+                    break;
                 }
+            }
+            if (!sFound) {
+                message.channel.send(`서버가 올바르지 않아요!\n예시: carbuncle, chocobo, moogle, mandragora, ...`);
+                return;
             }
 
             // 타입 체크
             let types = Object.keys(fflogsConfig.BASE_DEFAULT_CATEGORIES);
+            let tFound = false;
             for (let idx in types) {
-                if (fflogsConfig.BASE_DEFAULT_CATEGORIES[types[idx]].indexOf(searchInfo.type) === -1) {
-                    message.channel.send(`종류가 올바르지 않아요!\n\n예시: raid, 24raid, trial, trial_unreal, ultimate`);
-                    return;
+                if (fflogsConfig.BASE_DEFAULT_CATEGORIES[types[idx]].indexOf(searchInfo.type) > -1) {
+                    tFound = true;
+                    break;
                 }
+            }
+            if (!tFound) {
+                message.channel.send(`종류가 올바르지 않아요!\n\n예시: raid, 24raid, trial, trial_unreal, ultimate`);
+                return;
             }
 
             message.channel
@@ -97,7 +107,7 @@ module.exports = {
     execute(message, args) {
         const command = args.length > 0 ? args[0].toLowerCase() : '';
 
-        if (!args || (command && !cmdsUtil.isExistCommand(Object.keys(cmds), command))) {
+        if (args.length === 0 || (command && !cmdsUtil.isExistCommand(Object.keys(cmds), command))) {
             message.channel.send('', {
                 embed: {
                     color: parseInt('ff867d', 16),
