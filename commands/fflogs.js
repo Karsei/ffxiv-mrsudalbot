@@ -14,7 +14,7 @@ const cmds = {
             // 검색 파라미터 준비
             let searchInfo = {
                 server: args[0],
-                name: args[1],
+                userName: args[1],
                 type: args[2],
                 region: 'kr',
             };

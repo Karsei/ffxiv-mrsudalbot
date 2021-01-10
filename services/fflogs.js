@@ -131,7 +131,7 @@ const parser = {
         // ID 번호 조회
         let { id: charId,  url: charIdUrl } = await fflogsUtil.getCharacterId(pSearchInfo.region, pSearchInfo.server, pSearchInfo.userName);
         if (!charId) {
-            throw new Error('There is no proper character id.')
+            throw new Error(`There is no proper character id. (Id: ${charId}, Region: ${pSearchInfo.region}, Server: ${pSearchInfo.server}, Name: ${pSearchInfo.userName}`);
         }
 
         // Zone 찾기
