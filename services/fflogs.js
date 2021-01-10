@@ -194,7 +194,7 @@ const parser = {
                 let _parse = {
                     idx: parseInt(idx) + 1,
                     name: zoneData.encounters[idx].name,
-                    detail: parRes[0],
+                    detail: parRes,
                 }
                 parseList.push(_parse);
             }
@@ -222,6 +222,7 @@ const parseUtil = {
                 parseDetail.patch = $(this).find('td.patch-cell').html().replace(/(\r\n|\n|\r)/gm, '');
                 parseDetail.duration = $(this).find('td.main-table-number').eq(0).find('a').html().replace(/(\r\n|\n|\r)/gm, '');
                 parseDetail.date = parseInt($(this).find('script').html().match(/var reportDate \= new Date\(([\d]+)\)/i)[1]);
+                parseDetail.bestMedian = $('.best-perf-avg b').html().replace(/(\r\n|\n|\r)/gm, '');
                 parses.push(parseDetail);
             });
         }
