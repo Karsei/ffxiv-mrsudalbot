@@ -5,6 +5,7 @@ const axios = require('axios');
 const constants = require('../config/constants');
 const fflogsConfig = require('../config/fflogs');
 const logger = require('../libs/logger');
+const redis = require('../libs/redis');
 
 const fflogs = {
     fetchSearch: async (pSearchInfo, pSkipCache = false) => {

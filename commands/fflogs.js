@@ -1,5 +1,6 @@
 const constants = require('../config/constants');
 const fflogsConfig = require('../config/fflogs');
+const logger = require('../libs/logger');
 const fflogs = require('../services/fflogs');
 
 const cmds = {
@@ -49,45 +50,50 @@ const cmds = {
             message.channel
                 .send(`불러오고 있어요! 잠시만 기다려주세요...`)
                 .then(async waitMsg => {
-                    let parseStr = '';
-                    let searchRes = await fflogs.fetchSearch(searchInfo);
-                    for (let idx in searchRes) {
-                        let boss = searchRes[idx];
+                    try {
+                        let parseStr = '';
+                        let searchRes = await fflogs.fetchSearch(searchInfo);
+                        for (let idx in searchRes) {
+                            let boss = searchRes[idx];
 
-                        // parse 정보가 없으면 건너뜀
-                        if (boss.detail.length <= 0)    continue;
+                            // parse 정보가 없으면 건너뜀
+                            if (boss.detail.length <= 0)    continue;
 
-                        // parse 중에서 제일 잘 나온 parse를 선택한다.
-                        let highestRDPSDetail = {};
-                        let highestRDPS = 0;
-                        for (let detKey in boss.detail) {
-                            let parseDetail = boss.detail[detKey];
-                            if (parseInt(parseDetail.rdps) > parseInt(highestRDPS)) {
-                                highestRDPS = parseDetail.rdps;
-                                highestRDPSDetail = parseDetail;
+                            // parse 중에서 제일 잘 나온 parse를 선택한다.
+                            let highestRDPSDetail = {};
+                            let highestRDPS = 0;
+                            for (let detKey in boss.detail) {
+                                let parseDetail = boss.detail[detKey];
+                                if (parseInt(parseDetail.rdps) > parseInt(highestRDPS)) {
+                                    highestRDPS = parseDetail.rdps;
+                                    highestRDPSDetail = parseDetail;
+                                }
                             }
+
+                            // 줄바꿈
+                            if (parseStr !== '')    parseStr += "\n";
+                            parseStr += `${boss.name} - [Med: ${highestRDPSDetail.bestMedian}%][${highestRDPSDetail.useclass}] ${highestRDPSDetail.percentile}% (전체 ${highestRDPSDetail.parse}명), rDPS: ${highestRDPSDetail.rdps} ~ ${new Date(highestRDPSDetail.date).format('yyyy/MM/dd HH:mm:ss')}\n`;
                         }
 
-                        // 줄바꿈
-                        if (parseStr !== '')    parseStr += "\n";
-                        parseStr += `${boss.name} - [Med: ${highestRDPSDetail.bestMedian}%][${highestRDPSDetail.useclass}] ${highestRDPSDetail.percentile}% (전체 ${highestRDPSDetail.parse}명), rDPS: ${highestRDPSDetail.rdps} ~ ${new Date(highestRDPSDetail.date).format('yyyy/MM/dd HH:mm:ss')}\n`;
+                        // 전송
+                        waitMsg.edit('', {
+                            embed: {
+                                color: parseInt('b6f542', 16),
+                                title: `[${searchInfo.server.toUpperCase()}] ${searchInfo.name}`,
+                                description: `각 인스턴스마다 가장 잘 나온 데이터를 집계한 정보입니다.`,
+                                fields: [
+                                    { name: '정보', value: parseStr },
+                                ],
+                                timestamp: new Date(),
+                                footer: {
+                                    text: 'FFXIV Service ToolBot'
+                                }
+                            }
+                        });
+                    } catch (e) {
+                        waitMsg.edit('오류가 발생해서 보여드릴 수 없네요.. 잠시 후에 다시 시도해보세요.');
+                        logger.error(e.stack);
                     }
-
-                    // 전송
-                    waitMsg.edit('', {
-                        embed: {
-                            color: parseInt('b6f542', 16),
-                            title: `[${searchInfo.server.toUpperCase()}] ${searchInfo.name}`,
-                            description: `각 인스턴스마다 가장 잘 나온 데이터를 집계한 정보입니다.`,
-                            fields: [
-                                { name: '정보', value: parseStr },
-                            ],
-                            timestamp: new Date(),
-                            footer: {
-                                text: 'FFXIV Service ToolBot'
-                            }
-                        }
-                    });
                 });
         },
     },
