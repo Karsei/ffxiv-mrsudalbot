@@ -14,7 +14,7 @@ const fflogs = {
         try {
             if (pSkipCache || outdate) {
                 zoneData = await fflogsUtil.getZone();
-                fflogsCache.setZone(zoneData.data);
+                fflogsCache.setZone(JSON.stringify(zoneData.data));
             } else {
                 zoneData = await fflogsCache.getZone();
             }

@@ -16,7 +16,7 @@ const cmds = {
                 server: args[0],
                 name: args[1],
                 type: args[2],
-                region: 'ko',
+                region: 'kr',
             };
 
             // 서버 체크
