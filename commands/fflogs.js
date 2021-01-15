@@ -16,7 +16,7 @@ const cmds = {
                         description: `특정 컨텐츠의 각 인스턴스별 가장 잘 나온 데이터를 집계한 정보를 출력합니다.`,
                         fields: [
                             { name: '사용법', value: `${constants.DISCORD_CHAT_PREFIX}fflogs search <인스턴스종류> <지역> <서버> <닉네임>` },
-                            { name: '파라미터', value: `인스턴스졷류 - ${Object.keys(fflogsConfig.BASE_DEFAULT_CATEGORIES).join(', ')}\n지역 - kr, na, jp, fr\n서버 - moogle, carbuncle, mandragora, aegis, titan, ...` },
+                            { name: '파라미터', value: `인스턴스종류 - ${Object.keys(fflogsConfig.BASE_DEFAULT_CATEGORIES).join(', ')}\n지역 - kr, na, jp, fr\n서버 - moogle, carbuncle, mandragora, aegis, titan, ...` },
                             { name: '예시', value: `- ${constants.DISCORD_CHAT_PREFIX}fflogs search raid jp titan Hong Guildong\n - ${constants.DISCORD_CHAT_PREFIX}fflogs search trial kr moogle 홍길동` },
                         ],
                         timestamp: new Date(),
@@ -33,7 +33,7 @@ const cmds = {
                 type: args[0].toLowerCase(),
                 region: args[1].toLowerCase(),
                 server: args[2].toLowerCase(),
-                userName: args[4] ? `${args[3].toLowerCase()} ${args[4].toLowerCase()}` : args[3].toLowerCase(), 
+                userName: args[4] ? `${args[3]} ${args[4]}` : args[3], 
             };
 
             // 타입 체크
@@ -52,7 +52,7 @@ const cmds = {
                     break;
                 }
             }
-            if (!sFound) {
+            if (!rFound) {
                 message.channel.send(`지역이 올바르지 않아요!\n예시: kr, na, jp, fr`);
                 return;
             }

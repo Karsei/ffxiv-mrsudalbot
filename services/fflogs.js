@@ -166,8 +166,16 @@ const parser = {
         if (zoneData.partitions && Array.isArray(zoneData.partitions)) {
             let lastIdx = 1;
             let lastData = null;
+            let allFilteredCount = 0;
+            let filteredSameCount = 0;
             for (let _idx = 0, _all = zoneData.partitions.length; _idx < _all; _idx++) {
                 if (zoneData.partitions[_idx].default) {
+                    if (zoneData.partitions[_idx].filtered_name) {
+                        allFilteredCount++;
+                        if (zoneData.partitions[_idx].filtered_name === fflogsConfig.BASE_REGION_GAME_VERSION[userRegion]) {
+                            filteredSameCount++;
+                        }
+                    }
                     if (zoneData.partitions[_idx].filtered_name && zoneData.partitions[_idx].filtered_name !== fflogsConfig.BASE_REGION_GAME_VERSION[userRegion]) {
                         let versions = zoneData.partitions[_idx].filtered_name.match(/([\d].[\d])?([\d].[\d])/gmi);
                         if (versions) {
@@ -186,7 +194,11 @@ const parser = {
             if (!lastData) {
                 throw new Error('There is no proper partitions.');
             }
-            partitionNum = lastIdx;
+            if (allFilteredCount == 0 || (allFilteredCount > 0 && allFilteredCount == filteredSameCount)) {
+                partitionNum = 1;
+            } else {
+                partitionNum = lastIdx;
+            }
         }
 
         let parseList = [];
