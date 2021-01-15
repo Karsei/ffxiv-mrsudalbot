@@ -6,6 +6,7 @@ const constants = require('../config/constants');
 const fflogsConfig = require('../config/fflogs');
 const logger = require('../libs/logger');
 const redis = require('../libs/redis');
+const { ServiceError } = require('./libs/exceptions');
 
 const fflogs = {
     fetchSearch: async (pSearchInfo, pSkipCache = false) => {
@@ -20,8 +21,8 @@ const fflogs = {
                 zoneData = await fflogsCache.getZone();
             }
         } catch (e) {
-            console.error('Fetching Error');
-            console.error(e.toJSON());
+            logger.error('Fetching Error');
+            logger.error(e.stack);
             return [];
         }
 
@@ -113,7 +114,7 @@ const parser = {
             }
         }
         if (!userRegion) {
-            throw new Error('There is no proper converted region service.');
+            throw new ServiceError(`존재하지 않는 국제 지역이에요.`);
         }
 
         // 서비스 기준 찾기
@@ -126,19 +127,19 @@ const parser = {
             }
         }
         if (!region) {
-            throw new Error('There is no proper region service.');
+            throw new ServiceError(`존재하지 않는 지역 서비스에요.`);
         }
 
         // ID 번호 조회
         let { id: charId,  url: charIdUrl } = await fflogsUtil.getCharacterId(pSearchInfo.region, pSearchInfo.server, pSearchInfo.userName);
         if (!charId) {
-            throw new Error(`There is no proper character id. (Id: ${charId}, Region: ${pSearchInfo.region}, Server: ${pSearchInfo.server}, Name: ${pSearchInfo.userName}`);
+            throw new ServiceError(`아이디를 발견하지 못했어요.`);
         }
 
         // Zone 찾기
         let categories = Object.keys(fflogsConfig.BASE_DEFAULT_CATEGORIES);
         if (categories.indexOf(pSearchInfo.type) === -1) {
-            throw new Error('There is no proper category.');
+            throw new ServiceError('존재하지 않는 카테고리에요.');
         }
         let zoneData = null;
         for (let idx in pAllZoneData) {
@@ -148,7 +149,7 @@ const parser = {
             }
         }
         if (!zoneData) {
-            throw new Error('There is no proper zone data.');
+            throw new ServiceError('존재하지 않는 인스턴스 데이터에요.');
         }
 
         // Raidtype 찾기
@@ -158,7 +159,7 @@ const parser = {
             raidType = fflogsConfig.BASE_RAIDTYPES[pSearchInfo.type];
         }
         if (!raidType) {
-            throw new Error('There is no proper raid type.');
+            throw new ServiceError('존재하지 않는 레이드 타입이에요.');
         }
 
         // 파티션 찾기
@@ -192,7 +193,7 @@ const parser = {
                 }
             }
             if (!lastData) {
-                throw new Error('There is no proper partitions.');
+                throw new ServiceError('존재하지 않는 내부 필터에요.');
             }
             if (allFilteredCount == 0 || (allFilteredCount > 0 && allFilteredCount == filteredSameCount)) {
                 partitionNum = 1;

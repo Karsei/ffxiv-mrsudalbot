@@ -4,12 +4,13 @@ const constants = require('../config/constants');
 const fflogsConfig = require('../config/fflogs');
 const logger = require('../libs/logger');
 const fflogs = require('../services/fflogs');
+const { ServiceError } = require('./libs/exceptions');
 
 const cmds = {
     search: {
         execute: async (message, args) => {
             if (!args || args.length < 4) {
-                message.channel.send('', {
+                message.reply('', {
                     embed: {
                         color: parseInt('ff867d', 16),
                         title: '프프로그 검색 명령어 안내',
@@ -39,7 +40,7 @@ const cmds = {
             // 타입 체크
             let types = Object.keys(fflogsConfig.BASE_DEFAULT_CATEGORIES);
             if (types.indexOf(searchInfo.type) === -1) {
-                message.channel.send(`종류가 올바르지 않아요!\n예시: ${types.join(', ')}`);
+                message.reply(`종류가 올바르지 않아요!\n예시: ${types.join(', ')}`);
                 return;
             }
 
@@ -53,7 +54,7 @@ const cmds = {
                 }
             }
             if (!rFound) {
-                message.channel.send(`지역이 올바르지 않아요!\n예시: kr, na, jp, fr`);
+                message.reply(`지역이 올바르지 않아요!\n예시: kr, na, jp, fr`);
                 return;
             }
 
@@ -67,12 +68,11 @@ const cmds = {
                 }
             }
             if (!sFound) {
-                message.channel.send(`서버가 올바르지 않아요!\n예시: carbuncle, chocobo, moogle, mandragora, ...`);
+                message.reply(`서버가 올바르지 않아요!\n예시: carbuncle, chocobo, moogle, mandragora, ...`);
                 return;
             }
 
-            message.channel
-                .send(`불러오고 있어요! 잠시만 기다려주세요...`)
+            message.reply(`불러오고 있어요! 잠시만 기다려주세요...`)
                 .then(async waitMsg => {
                     try {
                         let parseStr = '';
@@ -119,8 +119,12 @@ const cmds = {
                             waitMsg.edit('집계된 내역이 없어요!');
                         }
                     } catch (e) {
-                        waitMsg.edit('오류가 발생해서 보여드릴 수 없네요.. 잠시 후에 다시 시도해보세요.');
-                        logger.error(e.stack);
+                        if (e instanceof ServiceError) {
+                            waitMsg.edit(e.message);
+                        } else {
+                            waitMsg.edit('오류가 발생해서 보여드릴 수 없네요.. 잠시 후에 다시 시도해보세요.');
+                            logger.error(e.stack);
+                        }
                     }
                 });
         },
@@ -142,7 +146,7 @@ module.exports = {
         const command = args.length > 0 ? args[0].toLowerCase() : '';
 
         if (args.length === 0 || (command && !cmdsUtil.isExistCommand(Object.keys(cmds), command))) {
-            message.channel.send('', {
+            message.reply('', {
                 embed: {
                     color: parseInt('ff867d', 16),
                     title: '프프로그 명령어 안내',
