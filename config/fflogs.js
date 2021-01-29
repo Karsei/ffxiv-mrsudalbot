@@ -10,16 +10,16 @@ const fflogsConfig = {
     BASE_REGION_SERVERS: {
         'global': [
             // JA
-            'Aegis', 'Atomos', 'Carbuncle', 'Garuda', 'Gungnir', 'Kujata', 'Ramuh', 'Tonberry', 'Typhon', 'Unicorn',
-            'Alexander', 'Bahamut', 'Durandal', 'Fenrir', 'Ifrit', 'Ridill', 'Tiamat', 'Ultima', 'Valefor', 'Yojimbo', 'Zeromus',
-            'Anima', 'Asura', 'Belias', 'Chocobo', 'Hades', 'Ixion', 'Mandragora', 'Masamune', 'Pandaemonium', 'Shinryu', 'Titan',
+            'aegis', 'atomos', 'carbuncle', 'garuda', 'gungnir', 'kujata', 'ramuh', 'tonberry', 'typhon', 'unicorn',
+            'alexander', 'bahamut', 'durandal', 'fenrir', 'ifrit', 'ridill', 'tiamat', 'ultima', 'valefor', 'yojimbo', 'zeromus',
+            'anima', 'asura', 'belias', 'chocobo', 'hades', 'ixion', 'mandragora', 'masamune', 'pandaemonium', 'shinryu', 'titan',
             // NA
-            'Adamantoise', 'Cactuar', 'Faerie', 'Gilgamesh', 'Jenova', 'Midgardsormr', 'Sargatanas', 'Siren',
-            'Behemoth', 'Excalibur', 'Exodus', 'Famfrit', 'Hyperion', 'Lamia', 'Leviathan', 'Ultros',
-            'Balmung', 'Brynhildr', 'Coeurl', 'Diabolos', 'Goblin', 'Malboro', 'Mateus', 'Zalera',
+            'adamantoise', 'cactuar', 'faerie', 'gilgamesh', 'jenova', 'midgardsormr', 'sargatanas', 'siren',
+            'behemoth', 'excalibur', 'exodus', 'famfrit', 'hyperion', 'lamia', 'leviathan', 'ultros',
+            'balmung', 'brynhildr', 'coeurl', 'diabolos', 'goblin', 'malboro', 'mateus', 'zalera',
             // EU
-            'Cerberus', 'Louisoix', 'Moogle', 'Omega', 'Ragnarok', 'Spriggan',
-            'Lich', 'Odin', 'Phoenix', 'Shiva', 'Twintania', 'Zodiark',
+            'cerberus', 'louisoix', 'moogle', 'omega', 'ragnarok', 'spriggan',
+            'lich', 'odin', 'phoenix', 'shiva', 'twintania', 'zodiark',
         ],
         'korea': ['carbuncle', 'moogle', 'chocobo', 'tonberry'],
     },
@@ -46,7 +46,7 @@ const fflogsConfig = {
         },
         'trial': {
             'global': 37,   // Trials III (Extreme)
-            'korea': 37,    // Trials III (Extreme)
+            'korea': 34,    // Trials II (Extreme)
         },
         'trial_unreal': {
             'global': 36,   // Trials (Unreal)

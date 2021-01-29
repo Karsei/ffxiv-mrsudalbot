@@ -6,7 +6,7 @@ const constants = require('../config/constants');
 const fflogsConfig = require('../config/fflogs');
 const logger = require('../libs/logger');
 const redis = require('../libs/redis');
-const { ServiceError } = require('./libs/exceptions');
+const { ServiceError } = require('../libs/exceptions');
 
 const fflogs = {
     fetchSearch: async (pSearchInfo, pSkipCache = false) => {

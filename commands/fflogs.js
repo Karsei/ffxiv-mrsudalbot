@@ -4,7 +4,7 @@ const constants = require('../config/constants');
 const fflogsConfig = require('../config/fflogs');
 const logger = require('../libs/logger');
 const fflogs = require('../services/fflogs');
-const { ServiceError } = require('./libs/exceptions');
+const { ServiceError } = require('../libs/exceptions');
 
 const cmds = {
     search: {

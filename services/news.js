@@ -140,7 +140,7 @@ const parser = {
                 return parseUtil.korea.notice(pageData, localeBaseUrl);
             default:
                 return parseUtil.korea.news(pageData, localeBaseUrl);
-        };
+        }
     },
 
     /**
