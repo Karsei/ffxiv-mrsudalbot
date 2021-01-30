@@ -10,7 +10,7 @@ const logger = require('./libs/logger');
 const redis = require('./libs/redis');
 const news = require('./services/news');
 const scheduler = require('./services/scheduler');
-const webhook = require('./services/webhooks');
+const { webhooks } = require('./services/webhooks');
 const constants = require('./config/constants');
 
 const discordBot = new Discord.Client();
@@ -57,9 +57,16 @@ discordBot.on('message', async (message) => {
             case `업타임`:
                 discordBot.commands.get('uptime').execute(message, args);
                 break;
+            // 따라하기
+            case `SAY`:
             case `ECHO`:
             case `말하기`:
                 discordBot.commands.get('echo').execute(message, args);
+                break;
+            // 소식 설정
+            case `NOTIFY`:
+            case `소식`:
+                discordBot.commands.get('notify').execute(message, args);
                 break;
         }
     }

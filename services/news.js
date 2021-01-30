@@ -53,20 +53,20 @@ const news = {
      * 특정 한국 소식
      */
     fetchKorea: async (pType, pSkipCache = false) => {
-        let outdate = await newsCache.isOutDate(pType, 'ko');
+        let outdate = await newsCache.isOutDate(pType, 'kr');
         if (pSkipCache || outdate) {
             try {
                 let data = await parser.parseKorea(categories.Korea[pType].url, pType);
-                newsCache.setCache(JSON.stringify(data), pType, 'ko');
+                newsCache.setCache(JSON.stringify(data), pType, 'kr');
                 return data;
             } catch (e) {
                 console.error('Fetching Korea Error');
                 console.error(e.toJSON());
-                let data = await newsCache.getCache(pType, 'ko');
+                let data = await newsCache.getCache(pType, 'kr');
                 return JSON.parse(data);
             }
         } else {
-            let data = await newsCache.getCache(pType, 'ko');
+            let data = await newsCache.getCache(pType, 'kr');
             return JSON.parse(data);
         }
     },

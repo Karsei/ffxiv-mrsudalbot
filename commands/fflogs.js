@@ -22,7 +22,7 @@ const cmds = {
                         ],
                         timestamp: new Date(),
                         footer: {
-                            text: 'FFXIV Service ToolBot'
+                            text: constants.APP_NAME
                         },
                     }
                 });
@@ -111,7 +111,7 @@ const cmds = {
                                     ],
                                     timestamp: new Date(),
                                     footer: {
-                                        text: 'FFXIV Service ToolBot'
+                                        text: constants.APP_NAME
                                     }
                                 }
                             });
@@ -156,7 +156,7 @@ module.exports = {
                     ],
                     timestamp: new Date(),
                     footer: {
-                        text: 'FFXIV Service ToolBot'
+                        text: constants.APP_NAME
                     },
                 }
             });

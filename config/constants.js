@@ -1,4 +1,7 @@
 const constants = {
+    // 이름
+    APP_NAME: '달달이봇',
+
     // 기본 통신 프로토콜
     BASE_URL_PROTOCOL: 'http',
 

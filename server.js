@@ -3,7 +3,7 @@ const bodyParser = require('body-parser');
 
 const constants = require('./config/constants');
 const logger = require('./libs/logger')
-const webhooks = require('./services/webhooks');
+const { webhooks } = require('./services/webhooks');
 
 const app = express();
 

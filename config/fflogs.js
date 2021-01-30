@@ -1,7 +1,7 @@
 const fflogsConfig = {
     BASE_REGION_GAME_VERSION: {
         'global': '5.4',
-        'korea': '5.2',
+        'korea': '5.3',
     },
     BASE_REGION_I18N: {
         'global': ['na', 'jp', 'fr'],
@@ -38,11 +38,11 @@ const fflogsConfig = {
         },
         'raid': {
             'global': 38,   // Eden's Promise
-            'korea': 33,    // Eden's Verse
+            'korea': 38,    // Eden's Verse
         },
         '24raid': {
             'global': 35,   // The Puppets' Bunker
-            'korea': 31,    // The Copied Factory
+            'korea': 35,    // The Copied Factory
         },
         'trial': {
             'global': 37,   // Trials III (Extreme)

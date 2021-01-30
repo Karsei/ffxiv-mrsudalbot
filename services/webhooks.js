@@ -26,7 +26,7 @@ const webhooks = {
         // 나라별 소식
         // 한국
         Object.keys(categories.Korea).map(type => {
-            cacheUtil.addWebhook('ko', type, pUrl);
+            cacheUtil.addWebhook('kr', type, pUrl);
         });
         // 글로벌
         Object.keys(categories.Global).map(type => {
@@ -69,7 +69,7 @@ const webhooks = {
      */
     newsExecute: async (pType, pCategory, pLocale) => {
         // 최신 소식을 가져오면서 Redis에 넣음
-        let newPosts = pLocale !== 'ko' ? await news.fetchGlobal(pType, pLocale, true) : await news.fetchKorea(pType, true);
+        let newPosts = pLocale !== 'kr' ? await news.fetchGlobal(pType, pLocale, true) : await news.fetchKorea(pType, true);
         newPosts = await cacheUtil.addId(newPosts, pLocale, pType);
         // Redis에 등록할 때 새로운 글이 없다면 그냥 끝냄
         if (newPosts.length === 0) return newPosts;
@@ -77,7 +77,7 @@ const webhooks = {
         // 소식을 Embed 메세지로 만듦
         let newEmbedPosts = newPosts.map(post => {
             let link = `${constants.BASE_URL_PROTOCOL}://`;
-            if ('ko' === pLocale)   link = `${link}${constants.BASE_URL_KOREA}${pCategory.link}`;
+            if ('kr' === pLocale)   link = `${link}${constants.BASE_URL_KOREA}${pCategory.link}`;
             else                    link = `${link}${pLocale}.${constants.BASE_URL_LODESTONE}${pCategory.link}`;
 
             return discordWebhookUtil.makeEmbed({
@@ -165,7 +165,7 @@ const webhooks = {
         let koreaTypes = Object.keys(categories.Korea);
         for (let idx in koreaTypes) {
             let type = koreaTypes[idx];
-            jobs.push(await Promise.delay(1000).return(webhooks.newsExecute(type, categories.Korea[type], 'ko')));
+            jobs.push(await Promise.delay(1000).return(webhooks.newsExecute(type, categories.Korea[type], 'kr')));
         }
 
         return jobs;
@@ -393,6 +393,18 @@ const cacheUtil = {
         let res = lPushAsync('webhooks-news-resend', JSON.stringify({ url: pUrl, body: pBody, locale: pLocale, type: pType }));
         return res;
     },
+
+    /**
+     * 서버 고유번호로 Webhook URL 조회
+     * 
+     * @param {string} pGuildId 서버 고유 번호
+     * @return {string} Webhook URL
+     */
+    getHookUrlByGuildId: async (pGuildId) => {
+        const sUrlAsync = promisify(redis.hget).bind(redis);
+        let res = sUrlAsync('all-guilds', pGuildId);
+        return res;
+    }
 }
 
 /**
@@ -475,4 +487,9 @@ const discordWebhookUtil = {
     },
 };
 
-module.exports = webhooks;
+const Webhooks = {
+    webhooks,
+    cacheUtil,
+};
+
+module.exports = Webhooks;

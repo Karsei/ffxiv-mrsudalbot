@@ -3,7 +3,7 @@
  */
 const cron = require('node-cron');
 
-const webhooks = require('./webhooks');
+const { webhooks } = require('./webhooks');
 
 const scheduler = {
     run: () => {
