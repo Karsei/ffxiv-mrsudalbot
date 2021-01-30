@@ -230,7 +230,7 @@ module.exports = {
                     title: '소식 명령어 안내',
                     description: `소식 관련 명령어를 실행합니다.`,
                     fields: [
-                        { name: '명령어 종류', value: `${constants.DISCORD_CHAT_PREFIX}notify [add|del]` },
+                        { name: '명령어 종류', value: `${constants.DISCORD_CHAT_PREFIX}notify [add|del|status]` },
                     ],
                     timestamp: new Date(),
                     footer: {
