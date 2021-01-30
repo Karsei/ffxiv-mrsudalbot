@@ -98,7 +98,7 @@
 </head>
 <body>
     <div class="ui text container">
-        <h1 class="ui inverted header">달달이봇</h1>
+        <h1 class="ui header">달달이봇</h1>
         <h2>파이널판타지 14 공식 홈페이지 소식과 FFlogs 조회 등 디스코브 봇에서 실시간으로 조회해보세요!</h2>
         <form method='get' action='<%= authorize_url %>'>
             <input type='hidden' name='response_type' value='code'>
@@ -107,7 +107,7 @@
             <input type='hidden' name='state' value='' />
             <input type='hidden' name='redirect_uri' value="<%= redirect_uri %>" />
             
-            <button class='ui huge primary button' type='submit'>봇 추가하기 <i class="right arrow icon"></i></button>
+            <button class='ui huge primary button' type='submit'>봇 추가하기</button>
         </form>
     </div>
     
@@ -120,7 +120,8 @@
                     <p>2. 달달이봇을 추가할 서버를 선택합니다.</p>
                     <p>3. 웹후크에서 달달이봇이 소식을 전해줄 채팅 채널을 골라주세요.</p>
                     <h3 class="ui header">명령어 사용 방법</h3>
-                    <p>명령어 앞에 <b>;!</b> 를 붙여서 사용하세요.</p>
+                    <p>명령어 앞에 <b>;!</b> 를 붙여서 사용하세요. (ex. ;!fflogs)</p>
+                    <p>자세한 설명은 아래의 명령어를 입력해서 나오는 설명을 읽어주세요.</p>
                 </div>
             </div>
         </div>
