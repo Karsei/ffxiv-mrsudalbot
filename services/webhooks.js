@@ -297,6 +297,19 @@ const cacheUtil = {
     },
 
     /**
+     * 게시글별 Webhook URL Cache 삭제
+     * 
+     * @param {string} pLocale 언어
+     * @param {string} pType 종류
+     * @param {string} pUrl Webhook URL
+     */
+    delWebhook: async (pLocale, pType, pUrl) => {
+        const sDelAsync = promisify(redis.srem).bind(redis);
+        let res = sDelAsync(`${pLocale}-${pType}-webhooks`, pUrl);
+        return res;
+    },
+
+    /**
      * 모든 서버 고유번호 목록에 등록
      * 
      * @param {string} pGuildId Discord 서버 고유번호
