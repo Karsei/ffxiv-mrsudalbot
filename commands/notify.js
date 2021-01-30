@@ -6,6 +6,7 @@ const categories = require('../config/categories');
 const logger = require('../libs/logger');
 const { cacheUtil } = require('../services/webhooks');
 const { Constants } = require('discord.js');
+const { cache } = require('ejs');
 
 const cmds = {
     // 추가
@@ -147,6 +148,65 @@ const cmds = {
             }
         },
     },
+
+    // 상태
+    status: {
+        execute: async (message, args) => {
+            try
+            {
+                // 해당 서버의 Webhook URL 확인
+                let hookUrl = await cacheUtil.getHookUrlByGuildId(message.guild.id);
+                if (!hookUrl) {
+                    message.reply('해당 디스코드 서버의 Webhook을 찾지 못했어요!');
+                    return;
+                }
+
+                let res = [];
+
+                let locales = [...lodestoneLocales, 'kr'];
+                let types = [...new Set([...Object.keys(categories.Global), ...Object.keys(categories.Korea)])];
+                for (let localeIdx in locales) {
+                    for (let typeIdx in types) {
+                        let res = await cacheUtil.checkInWebhook(locales[localeIdx], types[typeIdx], hookUrl);
+                        if (res) {
+                            res.push({ locale: locales[localeIdx], type: types[typeIdx] });
+                        }
+                    }
+                }
+
+                if (res.length > 0) {
+                    let str = '';
+                    for (let resIdx in res) {
+                        if (str.length > 0) {
+                            str += "\n";
+                        }
+                        str += `${res[resIdx].locale} - ${res[resIdx].type}`;
+                    }
+
+                    message.reply('', {
+                        embed: {
+                            color: parseInt('ff867d', 16),
+                            title: '소식 상태',
+                            description: `현재 구독하고 있는 소식 목록입니다.\n\n${str}`,
+                            timestamp: new Date(),
+                            footer: {
+                                text: constants.APP_NAME
+                            },
+                        }
+                    });
+                } else {
+                    message.reply('존재하는 소식 알림이 없네요!');
+                    return;
+                }
+            }
+            catch (e)
+            {
+                logger.error('소식 알림 상태 확인 오류');
+                logger.error(e.stack);
+            }
+            
+        },
+    },
 };
 
 const cmdsUtil = {
@@ -182,7 +242,7 @@ module.exports = {
         }
         args.shift();
 
-        if (['add', 'del'].indexOf(command) > -1) {
+        if (['add', 'del', 'status'].indexOf(command) > -1) {
             cmds[command].execute(message, args);
         }
     }

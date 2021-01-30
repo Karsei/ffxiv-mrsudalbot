@@ -344,6 +344,19 @@ const cacheUtil = {
     },
 
     /**
+     * 특정 소식에 해당 Webhook URL이 있는지 확인
+     * 
+     * @param {string} pLocale 언어
+     * @param {string} pType 종류
+     * @param {string} pUrl Webhook URL
+     */
+    checkInWebhook: async (pLocale, pType, pUrl) => {
+        const sismemberAsync = promisify(redis.sismember).bind(redis);
+        let res = sismemberAsync(`${pLocale}-${pType}-webhooks`, pUrl);
+        return res;
+    },
+
+    /**
      * 게시글 id Cache 등록
      * 
      * @param {string} pData 데이터
