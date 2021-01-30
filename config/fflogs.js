@@ -38,7 +38,7 @@ const fflogsConfig = {
         },
         'raid': {
             'global': 38,   // Eden's Promise
-            'korea': 38,    // Eden's Verse
+            'korea': 33,    // Eden's Verse
         },
         '24raid': {
             'global': 35,   // The Puppets' Bunker
