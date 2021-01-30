@@ -242,7 +242,7 @@ module.exports = {
         }
         args.shift();
 
-        if (message.member.guild.me.hasPermission('ADMINISTRATOR') || message.member.guild.me.hasPermmission('MANAGE_MESSAGES')) {
+        if (message.member.hasPermission('ADMINISTRATOR') || message.member.hasPermission('MANAGE_MESSAGES')) {
             if (['add', 'del', 'status'].indexOf(command) > -1) {
                 cmds[command].execute(message, args);
             }

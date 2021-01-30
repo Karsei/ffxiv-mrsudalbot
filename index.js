@@ -145,6 +145,7 @@ r.on('line', async (line) => {
 
         try {
             switch (cmd) {
+                case 'stop':
                 case 'exit': {
                     console.info('bye~!');
                     r.close();
