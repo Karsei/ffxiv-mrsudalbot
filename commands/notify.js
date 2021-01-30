@@ -5,7 +5,7 @@ const lodestoneLocales = require('../config/lodestoneLocales');
 const categories = require('../config/categories');
 const logger = require('../libs/logger');
 const { cacheUtil } = require('../services/webhooks');
-const { Constants } = require('discord.js');
+const { Constants, MessageManager } = require('discord.js');
 const { cache } = require('ejs');
 
 const cmds = {
@@ -242,8 +242,13 @@ module.exports = {
         }
         args.shift();
 
-        if (['add', 'del', 'status'].indexOf(command) > -1) {
-            cmds[command].execute(message, args);
+        if (message.member.guild.me.hasPermission('ADMINISTRATOR') || message.member.guild.me.hasPermmission('MANAGE_MESSAGES')) {
+            if (['add', 'del', 'status'].indexOf(command) > -1) {
+                cmds[command].execute(message, args);
+            }
+        } else {
+            message.reply('사용할 수 있는 권한이 없어요!');
+            return;
         }
     }
 };
