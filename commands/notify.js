@@ -117,11 +117,11 @@ const cmds = {
                 message.reply('존재하지 않는 종류에요.');
                 return;
             }
-            if (searchInfo.region === 'kr' && Object.keys(categories.Korea).indexOf(searchInfo.type) === -1) {
+            if (searchInfo.region === 'kr' && Object.keys(categories.Global).indexOf(searchInfo.type) > -1 && Object.keys(categories.Korea).indexOf(searchInfo.type) === -1) {
                 message.reply('한국 지역으로는 해당 종류를 사용할 수 없어요.');
                 return;
             }
-            if (lodestoneLocales.indexOf(searchInfo.region) > -1 && Object.keys(categories.Korea).indexOf(searchInfo.type) === -1) {
+            if (lodestoneLocales.indexOf(searchInfo.region) > -1 && Object.keys(categories.Global).indexOf(searchInfo.type) === -1 && Object.keys(categories.Korea).indexOf(searchInfo.type) > -1) {
                 message.reply('글로벌 지역으로는 해당 종류를 사용할 수 없어요.');
                 return;
             }
