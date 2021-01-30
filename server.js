@@ -40,10 +40,10 @@ app.get('/authorize', async (req, res) => {
         let redirectUri = `${constants.DISCORD_URL_BOT_HOST}/authorize`;
         let resHook = await webhooks.makeHookUrl(code, redirectUri);
         webhooks.subscribe(resHook.url, { guild_id: req.query.guild_id });
-        res.status(200).json({ msg: 'Success' });
+        res.send(`<script>alert("봇이 추가되었습니다. 디스코드를 확인하세요."); window.location.href = "/";</script>`);
     } catch (error) {
-        logger.error(error.message);
-        res.status(500).json({ msg: 'Failed. something error occured' });
+        logger.error(error.stack);
+        res.send(`<script>alert("봇을 추가하는 과정에서 오류가 발생했습니다."); window.location.href = "/";</script>`);
     }
 });
 
