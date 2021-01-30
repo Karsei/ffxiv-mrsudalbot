@@ -68,7 +68,7 @@ const cmds = {
                 let addRes = await cacheUtil.addWebhook(searchInfo.region, searchInfo.type, hookUrl);
                 message.reply('소식 설정이 성공적으로 변경되었어요!');
 
-                logger.info(`'${message.guild.name} (${message.guild.id})' 에서 ${searchInfo.region}, ${searchType.type} 소식을 추가함`);
+                logger.info(`'${message.guild.name} (${message.guild.id})' 에서 ${searchInfo.region}, ${searchInfo.type} 소식을 추가함`);
             }
             catch (e)
             {
@@ -138,7 +138,7 @@ const cmds = {
                 let delRes = await cacheUtil.delWebhook(searchInfo.region, searchInfo.type, hookUrl);
                 message.reply('소식 설정이 성공적으로 변경되었어요!');
 
-                logger.info(`'${message.guild.name} (${message.guild.id})' 에서 ${searchInfo.region}, ${searchType.type} 소식을 제거함`);
+                logger.info(`'${message.guild.name} (${message.guild.id})' 에서 ${searchInfo.region}, ${searchInfo.type} 소식을 제거함`);
             }
             catch (e)
             {
@@ -182,7 +182,7 @@ module.exports = {
         }
         args.shift();
 
-        if ('add' === command) {
+        if (['add', 'del'].indexOf(command) > -1) {
             cmds[command].execute(message, args);
         }
     }

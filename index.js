@@ -63,6 +63,10 @@ discordBot.on('message', async (message) => {
             case `말하기`:
                 discordBot.commands.get('echo').execute(message, args);
                 break;
+            // FFLOGS
+            case `FFLOGS`:
+            case `프프로그`:
+                discordBot.commands.get('fflogs').execute(message, args);
             // 소식 설정
             case `NOTIFY`:
             case `소식`:
