@@ -185,7 +185,7 @@ const cmds = {
 
                     message.reply('', {
                         embed: {
-                            color: parseInt('ff867d', 16),
+                            color: parseInt('ebcf34', 16),
                             title: '소식 상태',
                             description: `현재 구독하고 있는 소식 목록입니다.\n\n${str}`,
                             timestamp: new Date(),
