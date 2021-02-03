@@ -1,3 +1,7 @@
 .vscode
 log
 node_modules
+
+config/constants.js
+libs/redis.js
+package-lock.json

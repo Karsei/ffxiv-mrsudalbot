@@ -184,7 +184,7 @@ const webhooks = {
 
         while (count > 0) {
             let cachedData = await cacheUtil.popResendItem();
-            if (cached) {
+            if (cachedData) {
                 cachedData = JSON.parse(cachedData);
 
                 try {
@@ -200,6 +200,7 @@ const webhooks = {
 
                     success++;
                 } catch (err) {
+                    console.log(err);
                     logger.error('다시 전송하는데 최종적으로 실패함');
                     if (err.config)     logger.error(err.config);
                     if (err.response)   logger.error(err.response);
@@ -244,6 +245,7 @@ const sender = {
                         await cacheUtil.addResendItem(pHookUrl, pPost, pLocale, pType);
                         resolve('fail');
                     } else {
+                        console.error(err);
                         logger.error(err.config);
                         logger.error(err.response);
     
