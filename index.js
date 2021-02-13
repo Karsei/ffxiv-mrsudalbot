@@ -73,6 +73,11 @@ discordBot.on('message', async (message) => {
             case `소식`:
                 discordBot.commands.get('notify').execute(message, args);
                 break;
+            // 패션체크
+            case 'FASHION':
+            case '패션체크':
+                discordBot.commands.get('fashion').execute(message, args);
+                break;
         }
     }
 });

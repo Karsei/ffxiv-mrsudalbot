@@ -2,7 +2,7 @@ require('date-utils');
 
 const snoowrap = require('snoowrap');
 
-const logger = require('./libs/logger');
+const logger = require('../libs/logger');
 const { ServiceError } = require('../libs/exceptions');
 const constants = require('../config/constants');
 
