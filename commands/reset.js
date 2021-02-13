@@ -26,11 +26,13 @@ const calculateTime = (pStart, pEnd) => {
     let d_msec = diffDate % _sec;
     
     let diffDateStr = '';
-    if (d_day > 0)  diffDateStr += d_day + '일 ';
-    if (d_hour > 0) diffDateStr += d_hour + '시간 ';
-    if (d_min > 0)  diffDateStr += d_min + '분 ';
-    if (d_sec > 0)  diffDateStr += d_sec + '초 ';
-    if (d_msec > 0)  diffDateStr += d_msec + '';
+    diffDateStr += d_day + '일 ';
+    diffDateStr += d_hour + '시간 ';
+    diffDateStr += d_min + '분 ';
+    diffDateStr += d_sec + '초 ';
+    diffDateStr += d_msec + '';
+
+    diffDateStr += ' 남음';
 
     return diffDateStr;
 };
