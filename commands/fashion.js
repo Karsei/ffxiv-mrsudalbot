@@ -30,11 +30,14 @@ const cmds = {
                                 embed: {
                                     color: parseInt('fc03f4', 16),
                                     title: `패션 체크`,
-                                    description: `${latest.title}`,
+                                    description: `${latest.title}\n(Powered By. Kaiyoko Star)\n\n글로벌과 한국 서버의 패션 체크는 동일합니다.`,
                                     timestamp: new Date(),
                                     url: `https://www.reddit.com/${latest.permalink}`,
                                     image: {
                                         url: latest.url,
+                                    },
+                                    thumbnail: {
+                                        url: 'https://styles.redditmedia.com/t5_c3dzb/styles/profileIcon_ugxkdcpuxbp51.png?width=256&height=256&crop=256:256,smart&s=a1f754e55d562256c326bbc97302bc7d895e3806',
                                     },
                                     footer: {
                                         text: constants.APP_NAME,
