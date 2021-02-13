@@ -78,6 +78,11 @@ discordBot.on('message', async (message) => {
             case '패션체크':
                 discordBot.commands.get('fashion').execute(message, args);
                 break;
+            // 초기화 시간
+            case 'RESET':
+            case '초기화':
+                discordBot.commands.get('reset').execute(message, args);
+                break;
         }
     }
 });
