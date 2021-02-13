@@ -43,7 +43,7 @@ const cmds = {
                         const curTime = new Date();
 
                         // 일일 (매일 0시)
-                        let nextZero = new Date().setDate(curTime.getTime() + 1).setHours(0);
+                        let nextZero = new Date((new Date()).setHours(24, 0, 0, 0));
                         let daily = calculateTime(nextZero, new Date());
 
                         // 주간 (매주 화요일 오후 5시)
@@ -57,7 +57,10 @@ const cmds = {
                         let fashionReport = calculateTime(nextThursFivePm, new Date());
 
                         // 총사령부 납품 (매일 오전 5시)
-                        let nextGrand = new Date().setDate(curTime.getTime() + 1).setHours(5);
+                        let nextGrand = new Date((new Date()).setHours(29, 0, 0, 0));
+                        if (nextZero > curTime && nextZero - curTime > (3600 * 60 * 60 * 19)) {
+                            nextGrand = (new Date()).setHours(5);
+                        }
                         let grand = calculateTime(nextGrand, new Date());
 
                         // 주간 복권 (매주 토요일 오후 10시)
