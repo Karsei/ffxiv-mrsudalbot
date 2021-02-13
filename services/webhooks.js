@@ -245,7 +245,6 @@ const sender = {
                         await cacheUtil.addResendItem(pHookUrl, pPost, pLocale, pType);
                         resolve('fail');
                     } else {
-                        console.error(err);
                         logger.error(err.config);
                         logger.error(err.response);
     
@@ -254,7 +253,8 @@ const sender = {
                             if (err.response.data) {
                                 // Webhook 제거됨
                                 if (err.response.data.code === 10015) {
-                                    redis.srem(`${pLocale}-${pType}-webhooks`, pHookUrl);
+                                    await cacheUtil.delWebhook(pLocale, pType, pHookUrl);
+                                    logger.info(`웹 후크 삭제됨 > ${pLocale}, ${pType} - ${pHookUrl}`);
                                     resolve('removed');
                                 } else {
                                     await cacheUtil.addResendItem(pHookUrl, pPost, pLocale, pType);
@@ -270,8 +270,26 @@ const sender = {
                             await Promise.delay(err.response.data.retry_after);
                             await cacheUtil.addResendItem(pHookUrl, pPost, pLocale, pType);
                             resolve('limited');
+                        // 웹 후크가 없음
+                        } else if (err.response.status === 404) {
+                            if (err.response.data) {
+                                // Webhook 제거됨
+                                if (err.response.data.code === 10015) {
+                                    await cacheUtil.delWebhook(pLocale, pType, pHookUrl);
+                                    logger.info(`웹 후크 삭제됨 > ${pLocale}, ${pType} - ${pHookUrl}`);
+                                    resolve('removed');
+                                } else {
+                                    await cacheUtil.addResendItem(pHookUrl, pPost, pLocale, pType);
+                                    resolve('fail');
+                                }
+                            } else {
+                                logger.error('something error occured');
+                                await cacheUtil.addResendItem(pHookUrl, pPost, pLocale, pType);
+                                resolve('fail');
+                            }
                         // 그 외
                         } else {
+                            console.error(err);
                             await cacheUtil.addResendItem(pHookUrl, pPost, pLocale, pType);
                             resolve('fail');
                         }

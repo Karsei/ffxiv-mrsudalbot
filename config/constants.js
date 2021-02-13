@@ -37,6 +37,19 @@ const constants = {
 
     // FFLogs 웹 토큰
     FFLOGS_WEB_TOKEN: '',
+
+    // Reddit Client ID
+    REDDIT_CLIENT_ID: '',
+
+    // Reddit Client Secert
+    REDDIT_CLIENT_SECRET: '',
+
+    // Reddit Refresh Token
+    // https://not-an-aardvark.github.io/reddit-oauth-helper/
+    REDDIT_CLIENT_REFRESH_TOKEN: '',
+
+    // Reddit Access Token
+    REDDIT_CLIENT_ACCESS_TOKEN: '',
 };
 
 module.exports = constants;
