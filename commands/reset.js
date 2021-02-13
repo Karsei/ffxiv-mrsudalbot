@@ -51,12 +51,12 @@ const cmds = {
 
                         // 주간 (매주 화요일 오후 5시)
                         let nextTuesFivePm = getNextDayOfWeek(new Date(), 2);
-                        nextTuesFivePm.setHours(17);
+                        nextTuesFivePm.setHours(17, 0, 0, 0);
                         let weekly = calculateTime(nextTuesFivePm, new Date());
 
                         // 패션체크 보고 (매주 목요일 오후 5시)
                         let nextThursFivePm = getNextDayOfWeek(new Date(), 4);
-                        nextThursFivePm.setHours(17);
+                        nextThursFivePm.setHours(17, 0, 0, 0);
                         let fashionReport = calculateTime(nextThursFivePm, new Date());
 
                         // 총사령부 납품 (매일 오전 5시)
@@ -68,7 +68,7 @@ const cmds = {
 
                         // 주간 복권 (매주 토요일 오후 10시)
                         let nextWeeklyCact = getNextDayOfWeek(new Date(), 6);
-                        nextWeeklyCact.setHours(22);
+                        nextWeeklyCact.setHours(22, 0, 0, 0);
                         let weeklyCact = calculateTime(nextWeeklyCact, new Date());
 
                         waitMsg.edit('', {
@@ -76,11 +76,11 @@ const cmds = {
                                 color: parseInt('cfcfcf', 16),
                                 title: `초기화 시간`,
                                 fields: [
-                                    { name: '일일 (매일 0시)', value: daily },
-                                    { name: '주간 (매주 화요일 오후 5시)', value: weekly },
-                                    { name: '패션체크 보고 (매주 목용ㄹ 오후 5시)', value: fashionReport },
-                                    { name: '총사령부 납품 (매일 오전 5시)', value: grand },
-                                    { name: '주간 복권 (매주 토요일 오후 10시)', value: weeklyCact },
+                                    { name: '일일', value: `${daily}\n(매일 0시)` },
+                                    { name: '주간', value: `${weekly}\n(매주 화요일 오후 5시)` },
+                                    { name: '패션체크 보고', value: `${fashionReport}\n(매주 목요일 오후 5시)` },
+                                    { name: '총사령부 납품', value: `${grand}\n(매일 오전 5시)` },
+                                    { name: '주간 복권', value: `${weeklyCact}\n(매주 토요일 오후 10시)` },
                                 ],
                                 timestamp: new Date(),
                                 footer: {
