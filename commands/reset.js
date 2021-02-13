@@ -73,7 +73,7 @@ const cmds = {
 
                         waitMsg.edit('', {
                             embed: {
-                                color: parseInt('fc03f4', 16),
+                                color: parseInt('cfcfcf', 16),
                                 title: `초기화 시간`,
                                 fields: [
                                     { name: '일일 (매일 0시)', value: daily },
