@@ -2,6 +2,7 @@ require('date-utils');
 
 const logger = require('../libs/logger');
 const { ServiceError } = require('../libs/exceptions');
+const constants = require('../config/constants');
 
 function getNextDayOfWeek(date, dayOfWeek) {
     // Code to check that date and dayOfWeek are valid left as an exercise ;)
