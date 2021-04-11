@@ -26,6 +26,7 @@ const news = {
                 return data;
             } catch (e) {
                 console.error('Fetching Global Error');
+                console.log(e);
                 console.error(e.toJSON());
                 let data = await newsCache.getCache(pType, pLocale);
                 return JSON.parse(data);
@@ -281,7 +282,13 @@ const parseUtil = {
                     parseDetail.title = $(this).find('title').text().replace(/([\r\n|\n|\r])/gm, '').trim();
                     parseDetail.timestamp = $(this).find('published').text().replace(/([\r\n|\n|\r])/gm, '').trim();
 
-                    let $content = cheerio.load($(this).find('content').html().trim().replace(/<!--\[CDATA\[<([\w]+)-->/, '<$1>'));
+                    let $findContent = $(this).find('content').html();
+                    if ($findContent) {
+                        $findContent = `${$findContent}`.trim().replace(/<!--\[CDATA\[<([\w]+)-->/, '<$1>');
+                    } else {
+                        $findContent = '';
+                    }
+                    let $content = cheerio.load($findContent);
                     let descs = [];
                     $content('p').slice(0, 3).each(function (idx, ele) { if ($(this).text().length > 0) descs.push($(this).text()); });
                     parseDetail.description = descs.join('\n\n');
